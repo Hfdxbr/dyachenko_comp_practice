@@ -1,0 +1,22 @@
+name: Build&Release LaTeX Document
+
+on:
+  push:
+    tags:
+      - "final*"
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Up Git Repository
+        uses: actions/checkout@v2
+      - name: Compile LaTeX Document
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: report.tex
+          latexmk_shell_escape: true
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: report.pdf
