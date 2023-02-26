@@ -1,0 +1,58 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[style=russian]{csquotes}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[l3]{csvsimple}
+
+\usepackage{cleveref}
+\crefformat{equation}{(#2#1#3)}
+\crefrangeformat{equation}{(#3#1#4)~-~(#5#2#6)}
+\crefmultiformat{equation}{(#2#1#3)}{ и~(#2#1#3)}{, (#2#1#3)}{ и~(#2#1#3)}
+
+\allowdisplaybreaks
+
+\patchcmd{\thebibliography}{\section*{Список литературы}}{}{}{}
+
+\newcommand{\UpdateMe}[1]{\textcolor{red}{#1}}
+\DeclareMathOperator*{\argmax}{argmax}
+
+\newcommand{\University}{Московский государственный университет имени М.~В.~Ломоносова}
+\newcommand{\Department}{Кафедра \UpdateMe{НАЗВАНИЕ-КАФЕДРЫ}}
+\newcommand{\Student}{\UpdateMe{ИМЯ-СТУДЕНТА}}
+\newcommand{\GroupNum}{\UpdateMe{НОМЕР}}
+\newcommand{\Seminar}{\UpdateMe{НАЗВАНИЕ-ПРАКТИКУМА}}
+
+\begin{document}
+\begin{titlepage}
+    \centering
+    {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
+    \vfill
+    {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
+    \vfill
+    \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
+    \vfill
+    {\large Москва, \the\year{}\par}
+\end{titlepage}
+
+\section*{Задание}
+\UpdateMe{Описание задачи}
+
+\section*{Теория}
+\UpdateMe{Обозначения, основные конструкции, мат. постановка задачи}
+
+\section*{Результаты}
+\UpdateMe{Полученные результаты}
+
+\addcontentsline{toc}{section}{Список литературы}
+\begin{thebibliography}{99}
+  \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
+  \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
+  \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
+  \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
+\end{thebibliography}
+\end{document}
