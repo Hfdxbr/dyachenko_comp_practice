@@ -3,7 +3,7 @@ name: Build&Release LaTeX Document
 on:
   push:
     tags:
-      - "final*"
+      - "task*"
 jobs:
   build_latex:
     runs-on: ubuntu-latest
