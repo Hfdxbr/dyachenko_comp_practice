@@ -29,183 +29,68 @@
 
 \begin{document}
 \begin{titlepage}
-    \centering
-    {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
-    \vfill
-    {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
-    \vfill
-    \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
-    \vfill
-    {\large Москва, \the\year{}\par}
+  \centering
+  {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
+  \vfill
+  {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
+  \vfill
+  \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
+  \vfill
+  {\large Москва, \the\year{}\par}
 \end{titlepage}
 
 \section*{Задание}
-Решить задачу оптимального управления ({\bfseries Задача 30}):
+Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача 2.25}):
 \begin{gather*}
-  J = \int_0^1 \ddot{x}^2-48\dot{x}/\left(2+\cos{\alpha x}\right)dt \rightarrow \min\\
-  x(1)=\dot{x}(0)=0\\
-  \alpha\in\{0.0, 0.1, 1.0, 5.1\}
+  \alpha x_{tt}=\left(1+t^2\right)x, \quad t\in(0, \beta),\\
+  \left.x_{t}\right\vert_{t=0}=0,\\
+  \left.x_{t}\right\vert_{t=\beta}=1,\\
+  \alpha \in \{1.0, 0.01\}, \quad \beta \in \{1.0, 5.0\}.
 \end{gather*}
 
-\section*{Теория}
+\section*{Постановка задачи}
 
-Введем обозначения \(x_1=x, x_2=\dot{x}, u=\ddot{x}\). Тогда задача
-перепишется в виде:
-\begin{gather*}
-  \begin{cases}\dot{x}_1=x_2\\ \dot{x}_2=u \end{cases}\\
-  x_1(1)=0\\
-  x_2(0)=0\\
-  \int_0^1 u^2-48x_2/\left(2+\cos{\alpha x_1}\right)dt \rightarrow \min
-\end{gather*}
-
-\subsection*{Основные конструкции}
-
-\subsubsection*{Функция Лагранжа}
-
-\begin{gather*}
-  \hat{L}=\int_0^1L dt+l\\
-  L=\lambda_0 \left(u^2-48x_2/\left(2+\cos{\alpha x_1}\right)\right) + p_1\left(\dot{x}_1-x_2\right)+p_2\left(\dot{x}_2-u\right)=p_1 \dot{x}_1+p_2 \dot{x}_2 - H\\
-  l=\lambda_2 x_1(1)+\lambda_3 x_2(0)
-\end{gather*}
-
-\subsubsection*{Условия оптимальности}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\item
-  Уравнения
-  Эйлера-Лагранжа:
-  \begin{equation*}
-    \begin{cases}
-      -\frac{d}{dt}L_{\dot{x}_1}+L_{x_1}=0\\
-      -\frac{d}{dt}L_{\dot{x}_2}+L_{x_2}=0
-    \end{cases} \Rightarrow \begin{cases}
-      \dot{p}_1=\lambda_0 \frac{-48\alpha x_2\sin{\alpha x_1}}{\left(2+\cos(\alpha x_1)\right)^2}\\
-      \dot{p}_2=\lambda_0\frac{-48}{2+\cos{\alpha x_1}}-p_1
-    \end{cases}
-  \end{equation*}
-\item
-  Условия трансверсальности:
-  \begin{equation*}
-    \begin{cases}
-      L_{\dot{x}_1}(0)=l_{x_1}(0)\\
-      L_{\dot{x}_1}(1)=-l_{x_1}(1)\\
-      L_{\dot{x}_2}(0)=l_{x_2}(0)\\
-      L_{\dot{x}_2}(1)=-l_{x_2}(1)
-    \end{cases} \Rightarrow \begin{cases}
-      p_1(0)=0\\
-      p_1(1)=-\lambda_2\\
-      p_2(0)=\lambda_3\\
-      p_2(1)=0
-    \end{cases}
-  \end{equation*}
-\item
-  Условие оптимальности по управлению:
-  \begin{equation*}
-    \tilde{u}=\argmax(H)=\argmax\left(p_2u-\lambda_0 u^2\right) \Rightarrow \tilde{u}=\frac{p_2}{2\lambda_0}, \lambda_0 \neq 0
-  \end{equation*}
-\item
-  Условие невырожденности и неотрицательности:
-  \begin{equation*}
-    \sum_{i=0}^{3} |\lambda_i| \neq 0, \lambda_0 \ge 0
-  \end{equation*}
-\end{enumerate}
-
-\subsection*{Постановка задачи}
-
-\subsubsection*{Разбор тривиального случая \((\lambda_0=0)\)}
-
-В этом случае \(\tilde{u}=\argmax(p_2 u)\). При этом возможны 2
-ситуации:
-
-\begin{itemize}
-\item
-  \(p_2 \equiv 0\). Но тогда
-  \(\dot{p}_2\equiv 0 \Rightarrow p_1 \equiv 0 \Rightarrow\) Из условий
-  трансверсальности \(\forall i \quad \lambda_i=0\) , что противоречит
-  условию \textbf{4}.
-\item
-  \(p_2 \not\equiv 0 \Rightarrow \exists t_0 \in [0, 1] : p_2\left(O_{\varepsilon}(t_0)\right) \neq 0\).
-  Тогда при \(t\in O_{\varepsilon}(t_0)\) оптимальное управление
-  \(\tilde{u}=\pm\infty \Rightarrow \int_0^1 \tilde{u}^2+...\;dt > \int_{t\in O_\varepsilon(t)}\tilde{u}^2+...\;dt=\infty\),
-  что явно не соответствует оптимальному управлению.
-\end{itemize}
-
-Таким образом заключаем, что \(\lambda_0 \neq 0\).
-
-\subsubsection*{Общий случай}
-
-В силу однородности функции Лагранжа по множителям в качестве условия
-нормировки положим \(\lambda_0=1/2 \Rightarrow u=p_2\). Тогда краевая
-задача примет вид:
-
-\begin{equation}
-  \label{common_system}
-  \begin{cases}
-    \dot{x}_1=f_1(x_1,x_2,p_1,p_2)=x_2\\
-    \dot{x}_2=f_2(x_1,x_2,p_1,p_2)=p_2 \\
-    \dot{p}_1=f_3(x_1,x_2,p_1,p_2)=-\frac{24\alpha x_2\sin{\alpha x_1}}{\left(2+\cos(\alpha x_1\right)^2}\\
-    \dot{p}_2=f_4(x_1,x_2,p_1,p_2)=-\frac{24}{2+\cos{\alpha x_1}}-p_1
-    \end{cases}
-\end{equation}
-\begin{equation}
-  \label{left_conditions}
-  x_2(0)=0, \quad \quad p_1(0)=0
-\end{equation}
-\begin{equation}
-  \label{right_conditions}
-  x_1(1)=0, \quad \quad p_2(1)=0
-\end{equation}
+Введем обозначения \(x_1 = x, x_2=\dot{x}\). Тогда задача перепишется в виде:
+\begin{gather}
+  \label{common_system} \begin{cases}\dot{x}_2=\frac{x}{\alpha}\left(t^2+1\right)\\ \dot{x}_1=x_2 \end{cases},\\
+  \label{left_conditions} x_2(0)=0,\\
+  \label{right_conditions} x_2(\beta)=1.
+\end{gather}
 
 \section*{Методика решения}
 
-\subsection*{Численный метод решения}
-
-\subsubsection*{Метод Рунге-Кутта}
+\subsection*{Метод Рунге-Кутта}
 
 Пусть дана задача Коши
 \begin{equation*}
-  \begin{cases} \dot{x}_1=f_1(x_1,x_2,p_1,p_2,t)\\ \dot{x}_2=f_2(x_1,x_2,p_1,p_2,t)\\ \dot{p}_1=f_3(x_1,x_2,p_1,p_2,t)\\ \dot{p}_2=f_4(x_1,x_2,p_1,p_2,t) \end{cases}
+  \begin{cases} \dot{x}_1=f_1(x_1,x_2,t)\\ \dot{x}_2=f_2(x_1,x_2,t) \end{cases}
 \end{equation*}
-с известными в начальный момент времени значениями \(x_1^0\), \(\ x_2^0\), \(p_1^0\) и \(p_2^0\).
+с известными в начальный момент времени значениями \(x_1^0\) и \(\ x_2^0\).
 
-Допустим уже найдены значения в точке \(t_i\): \(x_1^i\), \(\ x_2^i\), \(p_1^i\) и \(p_2^i\). Тогда значения в точке \(t_{i+1}\) вычисляются по
+Допустим уже найдены значения в точке \(t_i\): \(x_1^{i}\) и \(\ x_2^{i}\). Тогда значения в точке \(t_{i+1}\) вычисляются по
 схеме:
 
 \begin{gather*}
-  k_{m1}=h f_m(x_1^i,x_2^i,p_1^i,p_2^i, t) \\ 
-  k_{m2}=h f_m(x_1^i + 0.5 k_{11},x_2^i + 0.5 k_{21},p_1^i + 0.5 k_{31},p_2^i + 0.5 k_{41}, t + 0.5 h) \\ 
+  k_{m1}=h f_m(x_1^{i},x_2^{i}, t), \\ 
+  k_{m2}=h f_m(x_1^{i} + 0.5 k_{11},x_2^{i} + 0.5 k_{21}, t + 0.5 h), \\ 
+  k_{m3}=h f_m(x_1^{i} + 0.25 (k_{11}+k_{12}),x_2^{i} + 0.25 (k_{21}+k_{22}), t + 0.5 h),\\
+  k_{m4}=f_m(x_1^{i} - k_{12} + 2 k_{13},x_2^{i} - k_{22} + 2 k_{23}, t + h),\\
   \begin{align*}
-    k_{m3}=h f_m(&x_1^i + 0.25 (k_{11}+k_{12}),x_2^i + 0.25 (k_{21}+k_{22}),\\
-                 &p_1^i + 0.25 (k_{31}+k_{32}),p_2^i + 0.25 (k_{41}+k_{42}), t + 0.5 h)
+    k_{m5}=h f_m(x_1^{i} + \frac{1}{27}(7 k_{11}+10 k_{12}+k_{14}), x_2^{i} + \frac{1}{27}(7 k_{21}+10 k_{22}+k_{24}), t + \frac{2}{3} h),
   \end{align*} \\
   \begin{align*}
-    k_{m4}=f_m(&x_1^i - k_{12} + 2 k_{13},x_2^i - k_{22} + 2 k_{23},\\
-               &p_1^i - k_{32} + 2 k_{33},p_2^i - k_{42} + 2 k_{43}, t + h)
+    k_{m6}=h f_m( & x_1^{i} + \frac{1}{625}(28 k_{11}-125 k_{12}+ 546 k_{13}+54 k_{14}-378 k_{15}),                      \\
+                  & x_2^{i} + \frac{1}{625}(28 k_{21}-125 k_{22}+ 546 k_{23}+54 k_{24}-378 k_{25}), t + \frac{1}{5} h),
   \end{align*} \\
-  \begin{align*}
-    k_{m5}=h f_m(&x_1^i + \frac{1}{27}(7 k_{11}+10 k_{12}+k_{14}),\\
-                 &x_2^i + \frac{1}{27}(7 k_{21}+10 k_{22}+k_{24}),\\
-                 &p_1^i + \frac{1}{27}(7 k_{31}+10 k_{32}+k_{34}),\\
-                 &p_2^i + \frac{1}{27}(7 k_{41}+10 k_{42}+k_{44}), t + \frac{2}{3} h)
-  \end{align*} \\
-  \begin{align*}
-    k_{m6}=h f_m(&x_1^i + \frac{1}{625}(28 k_{11}-125 k_{12}+ 546 k_{13}+54 k_{14}-378 k_{15}),\\
-                 &x_2^i + \frac{1}{625}(28 k_{21}-125 k_{22}+ 546 k_{23}+54 k_{24}-378 k_{25}),\\
-                 &p_1^i + \frac{1}{625}(28 k_{31}-125 k_{32}+ 546 k_{33}+54 k_{34}-378 k_{35}),\\
-                 &p_2^i + \frac{1}{625}(28 k_{41}-125 k_{42}+ 546 k_{43}+54 k_{44}-378 k_{45}), t + \frac{1}{5} h)
-  \end{align*} \\
-  x_1^{i+1}=\gamma_1^h(x_1^i)=x_1^{i} + \frac{1}{24}k_{11} + \frac{5}{48} k_{14} + \frac{27}{56} k_{15} + \frac{125}{336} k_{16} \\ 
-  x_2^{i+1}=\gamma_2^h(x_2^i)=x_2^{i} + \frac{1}{24}k_{21} + \frac{5}{48} k_{24} + \frac{27}{56} k_{25} + \frac{125}{336} k_{26} \\ 
-  p_1^{i+1}=\gamma_3^h(p_1^i)=p_1^{i} + \frac{1}{24}k_{31} + \frac{5}{48} k_{34} + \frac{27}{56} k_{35} + \frac{125}{336} k_{36} \\ 
-  p_2^{i+1}=\gamma_4^h(p_2^i)=p_2^{i} + \frac{1}{24}k_{41} + \frac{5}{48} k_{44} + \frac{27}{56} k_{45} + \frac{125}{336} k_{46}
+  x_1^{i+1}=\gamma_1^h(x_1^{i})=x_1^{i} + \frac{1}{24}k_{11} + \frac{5}{48} k_{14} + \frac{27}{56} k_{15} + \frac{125}{336} k_{16}, \\ 
+  x_2^{i+1}=\gamma_2^h(x_2^{i})=x_2^{i} + \frac{1}{24}k_{21} + \frac{5}{48} k_{24} + \frac{27}{56} k_{25} + \frac{125}{336} k_{26},
 \end{gather*}
 
 где \(h=h(t_i)\) - адаптивный шаг по времени.
 
-\subsubsection*{Адаптивный шаг по времени}
+\subsection*{Адаптивный шаг по времени}
 
-Пусть задан уровень погрешности \(\varepsilon\). Обозначим за \(y^i\)
+Пусть задан уровень погрешности \(\varepsilon\). Обозначим за \(y^{i}\)
 значение искомой функции в текущей точке, а за \(h\) - текущий шаг по
 времени.
 
@@ -215,189 +100,102 @@
 \end{equation*}
 Тогда новый шаг на каждой итерации будет вычисляться по формулам
 \begin{equation*}
-  err = \Vert (\delta\gamma_{1}, \delta\gamma_{2}, \delta\gamma_{3}, \delta\gamma_{4})\Vert
+  err = \Vert (\delta\gamma_{1}, \delta\gamma_{2})\Vert,
 \end{equation*}
 \begin{equation*}
   h'=\begin{cases}
-    0.95 h \sqrt[5]{\frac{\varepsilon}{x+err}}, \quad err \not\in [0.1 \varepsilon, \varepsilon]\\
+    0.95 h \sqrt[5]{\frac{\varepsilon}{x+err}}, \quad err \not\in [0.1 \varepsilon, \varepsilon] \\
     h, \quad  err \in [0.1 \varepsilon, \varepsilon]
-  \end{cases}
+  \end{cases},
 \end{equation*}
 где \(x\) - маленькая
 положительная константа избавляющая нас от необходимости проверять, что
 \(err \neq 0\). Например можно взять \(x=0.001 \varepsilon\).
 
-\subsubsection*{Метод стрельбы}
+\subsection*{Метод стрельбы}
 
-Для краевой задачи \cref{common_system} из краевых условий \cref{left_conditions} имеем
+Для краевой задачи \cref{common_system} из краевого условия \cref{left_conditions} имеем
 \begin{equation*}
-  p_1^0=0, \quad x_2^0=0
+  x_2^0=0.
 \end{equation*}
 
-Два других ``начальных'' значения выберем в качестве параметров
-пристрелки
+Другое ``начальное'' значения выберем в качестве параметра пристрелки
 
 \begin{equation*}
-  x_1^0=a, \quad p_2^0=b
+  x_1^0=a.
 \end{equation*}
 
-Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=1\) получим некоторое решение \(\tilde{x}_1\), \(\tilde{x}_2\), \(\tilde{p}_1\) и \(\tilde{p}_2\).
+Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=\beta\) получим некоторое решение \(\tilde{x}_1\) и \(\tilde{x}_2\).
 
-Варьируя параметры \(a\) и \(b\) необходимо добиться выполнения краевых условий \cref{right_conditions}:
+Варьируя параметр \(a\) необходимо добиться выполнения краевого условия \cref{right_conditions}:
 \begin{equation*}
-  \tilde{x}_1(1)=x_1^N=0, \quad \tilde{p}_2(1)=p_2^N=0
+  \tilde{x}_2(\beta)=x_2^N=1.
 \end{equation*}
 
-Будем искать параметры \(a\) и \(b\) методом простых итераций. Введём
-функции \(\phi_1\) и \(\phi_2\) показывающие отклонение от заданного
+Будем искать параметр \(a\) методом простых итераций. Введём функцию \(\phi\) показывающую отклонение от заданного
 граничного условия:
+\begin{equation*}
+  \phi(a)=x_2^N-1.
+\end{equation*}
+
+Разложив эту функцию в окрестности точки \((a^{i})\) получим:
+
+\begin{equation*}
+  \phi(a)\simeq\phi(a^{i})+\delta a\frac{\partial \phi}{\partial a}(a^{i})\simeq0,
+\end{equation*}
+
+где \(\delta a=a^{i+1}-a^{i}\). 
+
+Тогда итерационный процесс может быть выражен формулой:
+\begin{equation*}
+  a^{i+1}=a^{i}-\phi(a^{i}) / \phi_a(a^{i}).
+\end{equation*}
+
+В случае \(\phi_a(a^{i})=0\) значение \(a\) сбрасывается на случайное из интервала \([-10, 10]\).
+
+\subsection*{Оценка глобальной погрешности}
+Для оценки глобальной погрешности необходимо найти логарифмическую норму матрицы \(A=\frac{\partial \vec{f}}{\partial \vec{x}}\):
 \begin{gather*}
-  \phi_1(a,b)=x_1^N-0=0\\
-  \phi_2(a,b)=p_2^N-0=0
+  A=\begin{pmatrix}
+    0                    & 1  \\
+    \frac{t^2+1}{\alpha} & 0
+  \end{pmatrix}, \quad \frac{1}{2}\left(A^T+A\right)=\begin{pmatrix}
+    0                            & \frac{t^2+\alpha+1}{2\alpha} \\
+    \frac{t^2+\alpha+1}{2\alpha} & 0
+  \end{pmatrix}\Rightarrow\\
+  \Rightarrow \lambda=\pm\frac{t^2+\alpha+1}{2\alpha}.\\
+  \mu(A) = \lambda_{\max}=\frac{t^2+\alpha+1}{2\alpha}.
 \end{gather*}
-
-Разложив эти функции в окрестности точки \((a^i, b^i)\) получим:
-
-\begin{gather*}
-  \phi_1(a,b)\simeq\phi_1(a^i,b^i)+\delta a\frac{\partial \phi_1}{\partial a}(a^i,b^i)+\delta b\frac{\partial \phi_1}{\partial b}(a^i,b^i)\simeq0\\
-  \phi_2(a,b)\simeq\phi_2(a^i,b^i)+\delta a\frac{\partial \phi_2}{\partial a}(a^i,b^i)+\delta b\frac{\partial \phi_2}{\partial b}(a^i,b^i)\simeq0
-\end{gather*}
-
-где \(\delta z=z^{i+1}-z^{i}\). В матричном виде уравнения примут вид
-
-\begin{equation*}
-  \begin{pmatrix} 
-    \frac{\partial \phi_1}{\partial a}(a^i,b^i)&\frac{\partial \phi_1}{\partial b}(a^i,b^i)\\
-    \frac{\partial \phi_2}{\partial a}(a^i,b^i)&\frac{\partial \phi_2}{\partial b}(a^i,b^i)
-  \end{pmatrix} \cdot \begin{pmatrix}
-    \delta a\\
-    \delta b
-  \end{pmatrix} =W\cdot\begin{pmatrix}
-    \delta a\\
-    \delta b
-  \end{pmatrix} = -\begin{pmatrix}
-    \phi_1(a^i,b^i)\\
-    \phi_2(a^i,b^i)
-  \end{pmatrix}
-\end{equation*}
-
-Тогда итерационный процесс может быть выражен формулой
-
-\begin{equation*}
-  \begin{pmatrix}
-    a^{i+1}\\
-    b^{i+1}
-  \end{pmatrix}=\begin{pmatrix}
-    a^{i}\\
-    b^{i}
-  \end{pmatrix}-W^{-1}\cdot \begin{pmatrix}
-    \phi_1(a^i,b^i)\\
-    \phi_2(a^i,b^i)
-  \end{pmatrix}
-\end{equation*}
-
-\subsection*{Аналитическое решение при
-\(\alpha=0\)}
-
-В данном случае система \cref{common_system} разбивается на две подсистемы:
-
-\begin{equation}
-  \label{simple_x}
-  \begin{cases}
-    \dot{p}_1=0\\
-    \dot{p}_2=-8-p_1
-  \end{cases}
-\end{equation}
-
-\begin{equation}
-  \label{simple_p}
-  \begin{cases}
-    \dot{x}_1=x_2\\
-    \dot{x}_2=p_2
-  \end{cases}
-\end{equation}
-
-Из уравнения \cref{simple_p} с учетом граничных условий \cref{left_conditions,right_conditions} получим
-
-\(p_1=0, \quad p_2=8\left(1-t\right)\)
-
-Тогда из уравнения \cref{simple_x} найдём выражения для \(x_1\) и \(x_2\)
-
-\(x_2=4\left(1-t\right)^2+C_2\)
-
-\(x_1=\frac{4}{3}\left(1-t\right)^3+C_2 t+C_3\)
-
-Подставив эти функции в оставшиеся граничные условия \cref{left_conditions,right_conditions} получим систему на коэффициенты
-
-\begin{equation*}
-  \begin{cases}
-    4+C_2=0\\
-    C_2+C_3=0
-  \end{cases} \Rightarrow x=\frac{4}{3}\left(1-t\right)^3-4 (1-t)
-\end{equation*}
 
 \section*{Результаты}
-Начальные параметры \(x_1^0\) и \(p_2^0\) искались итеративно для последовательных \(\alpha\): \(\left(x_1^0, p_2^0\right)\) для \(\alpha=0.0\) принимались за стартовую точку для \(\alpha=0.1\) и т.д. 
 
-В случае \(\det\vert W\vert=0\) значения сбрасывались на случайные из интервала \([-10, 10]\).
-
-\subsection*{Случай \(\alpha=0.0\)}
+\subsection*{Случай \(\alpha=1.0\) \(\beta=1.0\)}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {points_alpha0.0.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b1.0.csv};
     \addlegendentry{$x_1$}
-    \addplot [only marks, mark = x, black]table [x=t, y=x1, col sep=comma] {analitic_points_alpha0.0.csv};
-    \addlegendentry{$x_1^t$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {points_alpha0.0.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b1.0.csv};
     \addlegendentry{$x_2$}
-    \addplot [thick, mark = none, green]table [x=t, y=p1, col sep=comma] {points_alpha0.0.csv};
-    \addlegendentry{$p_1$}
-    \addplot [thick, mark = none, black]table [x=t, y=p2, col sep=comma] {points_alpha0.0.csv};
-    \addlegendentry{$p_2$}
   \end{axis}
 \end{tikzpicture}
 
-Как видно их графика, аналитическое решение \(x_1^t\) и численное \(x_1\) совпадают.
-
-\subsection*{Случай \(\alpha=0.1\)}
+\subsection*{Случай \(\alpha=1.0\) \(\beta=5.0\)}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {points_alpha0.1.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b5.0.csv};
     \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {points_alpha0.1.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b5.0.csv};
     \addlegendentry{$x_2$}
-    \addplot [thick, mark = none, green]table [x=t, y=p1, col sep=comma] {points_alpha0.1.csv};
-    \addlegendentry{$p_1$}
-    \addplot [thick, mark = none, black]table [x=t, y=p2, col sep=comma] {points_alpha0.1.csv};
-    \addlegendentry{$p_2$}
   \end{axis}
 \end{tikzpicture}
 
-\subsection*{Случай \(\alpha=1.0\)}
+\subsection*{Случай \(\alpha=0.01\) \(\beta=1.0\)}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {points_alpha1.0.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a0.01_b1.0.csv};
     \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {points_alpha1.0.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a0.01_b1.0.csv};
     \addlegendentry{$x_2$}
-    \addplot [thick, mark = none, green]table [x=t, y=p1, col sep=comma] {points_alpha1.0.csv};
-    \addlegendentry{$p_1$}
-    \addplot [thick, mark = none, black]table [x=t, y=p2, col sep=comma] {points_alpha1.0.csv};
-    \addlegendentry{$p_2$}
-  \end{axis}
-\end{tikzpicture}
-
-\subsection*{Случай \(\alpha=5.1\)}
-\begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {points_alpha5.1.csv};
-    \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {points_alpha5.1.csv};
-    \addlegendentry{$x_2$}
-    \addplot [thick, mark = none, green]table [x=t, y=p1, col sep=comma] {points_alpha5.1.csv};
-    \addlegendentry{$p_1$}
-    \addplot [thick, mark = none, black]table [x=t, y=p2, col sep=comma] {points_alpha5.1.csv};
-    \addlegendentry{$p_2$}
   \end{axis}
 \end{tikzpicture}
 
