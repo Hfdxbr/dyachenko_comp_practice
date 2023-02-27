@@ -6,18 +6,21 @@
 #include <iostream>
 #include <numeric>
 #include <random>
+#include <string>
 #include <vector>
 
 #include "printer.h"
 #include "vector.h"
 
-constexpr double eps = 1e-11;
+double eps;
+bool print_data = false;
 
 using Vector2D = Vector<double, 2>;
 using Point = Vector2D;
 using Coeffs = Vector2D;
 using TimePoint = std::pair<double, Point>;
 using Solution = std::vector<TimePoint>;
+using namespace std::string_literals;
 
 double f1(const Point& p, double t, double alpha) {
   const auto& [x1, x2] = p.as_tuple();
@@ -63,7 +66,7 @@ Solution solve(double x10, double alpha, double beta, double& error) {
   double t = 0;
   double T = beta;
   double h = eps * 100.;
-  double max_allowed_h = T / 100;  // For smoother graphic
+  // double max_allowed_h = T / 100;  // For smoother graphic
   Solution sol = {TimePoint{0, {x10, 0}}};
   while (t < T) {
     auto [p, err] = gammas_with_error(sol.back().second, t, alpha, h);
@@ -73,10 +76,10 @@ Solution solve(double x10, double alpha, double beta, double& error) {
     }
 
     bool need_recalc = false;
-    if (h > max_allowed_h) {
-      h = max_allowed_h;
-      need_recalc = true;
-    }
+    // if (h > max_allowed_h) {
+    //   h = max_allowed_h;
+    //   need_recalc = true;
+    // }
 
     if (t + h >= T) {
       h = T - t;
@@ -147,26 +150,32 @@ void execute(double x10, double alpha, double beta) {
   ofs_stats << std::setprecision(8) << std::fixed;
   PrintHelper ph(ofs_stats, "", "\n", ",");
   if (!stats_exists)
-    ph.print("\\(\\alpha\\)", "\\(\\beta\\)", "\\(x_1(0)\\)", "\\(x_2(\\beta)\\)", "\\(error\\)");
+    ph.print("\\(\\alpha\\)", "\\(\\beta\\)", "\\(\\varepsilon\\)", "n", "\\(x_1(0)\\)", "\\(x_2(\\beta)\\)",
+             "\\(error\\)");
 
   double error = 0;
   Solution sol = shooting(x10, alpha, beta, error);
 
   int ap = alpha > 0.1 ? 1 : 2;
   std::string plot_file = "a" + to_string(alpha, ap) + "_b" + to_string(beta, 1) + ".csv";
-  print_points(sol, alpha, plot_file);
+  if (print_data)
+    print_points(sol, alpha, plot_file);
   const auto [x1, x2] = sol.back().second.as_tuple();
-  ph.print(to_string(alpha, ap), to_string(beta, 1), x10, x2, to_string(error, 3, std::scientific));
+  ph.print(to_string(alpha, ap), to_string(beta, 1), to_string(eps, 1, std::scientific), sol.size(), x10, x2,
+           to_string(error, 3, std::scientific));
 }
 
 int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    std::cout << "alpha and beta parameters required" << std::endl;
+  if (argc < 4) {
+    std::cout << "alpha, beta and eps parameters required" << std::endl;
     return 1;
   }
   double alpha = std::stod(argv[1]);
   double beta = std::stod(argv[2]);
-  double x10 = argc == 4 ? std::stod(argv[3]) : 1.0;
+  eps = std::stod(argv[3]);
+  if (argc == 5 && argv[4] == "print"s)
+    print_data = true;
+  double x10 = 1.0;
   execute(x10, alpha, beta);
 
   return 0;

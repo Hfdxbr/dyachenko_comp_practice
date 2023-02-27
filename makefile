@@ -1,20 +1,20 @@
-GCC = g++-10
+GCC = g++-11
 CPPFLAGS = -std=c++17 -O3
 LINKFLAGS = $(CPPFLAGS)
 
 report: clean_data latex clean_tex clean_cpp
 
-a1.0_b1.0: build
-	./main 1.0 1.0
-
-a1.0_b5.0: build
-	./main 1.0 5.0
-
-a0.01_b1.0: build
-	./main 0.01 1.0
-
-a0.01_b5.0: build
-	./main 0.01 5.0
+prepare_data: build
+	./main 1.0 1.0 1e-7
+	./main 1.0 1.0 1e-9
+	./main 1.0 1.0 1e-11 print
+	./main 1.0 5.0 1e-7
+	./main 1.0 5.0 1e-9
+	./main 1.0 5.0 1e-11 print
+	./main 0.01 1.0 1e-7
+	./main 0.01 1.0 1e-9
+	./main 0.01 1.0 1e-11 print
+	echo "0.01,5.0,-,-,-,-" >>stats.csv
 
 build: main.o
 	${GCC} $? -o main $(LINKFLAGS)
@@ -22,7 +22,7 @@ build: main.o
 %.o: %.cpp
 	${GCC} -c $< -o $@ $(CPPFLAGS)
 
-latex: a1.0_b1.0 a1.0_b5.0 a0.01_b1.0
+latex: prepare_data
 	pdflatex -interaction=nonstopmode report > /dev/null
 	pdflatex -interaction=nonstopmode report > /dev/null
 

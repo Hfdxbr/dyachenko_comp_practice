@@ -28,19 +28,19 @@
 \newcommand{\Seminar}{\UpdateMe{НАЗВАНИЕ-ПРАКТИКУМА}}
 
 \begin{document}
-\begin{titlepage}
-  \centering
-  {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
-  \vfill
-  {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
-  \vfill
-  \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
-  \vfill
-  {\large Москва, \the\year{}\par}
-\end{titlepage}
+% \begin{titlepage}
+%   \centering
+%   {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
+%   \vfill
+%   {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
+%   \vfill
+%   \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
+%   \vfill
+%   {\large Москва, \the\year{}\par}
+% \end{titlepage}
 
 \section*{Задание}
-Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача 2.25}):
+Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.25}):
 \begin{gather*}
   \alpha x_{tt}=\left(1+t^2\right)x, \quad t\in(0, \beta),\\
   \left.x_{t}\right\vert_{t=0}=0,\\
@@ -169,6 +169,20 @@
 
 \section*{Результаты}
 
+\subsection*{Сводная таблица}
+\csvautotabular{stats.csv}
+
+Для каждого набора параметров \(\alpha\) и \(\beta\) должно быть выполнено:
+\begin{equation*}
+  \frac{n_{i}}{n_{j}}=\left(\frac{\varepsilon_{i}}{\varepsilon_{j}}\right)^{1/s}, \quad \frac{error_{i}}{error_{j}}=\left(\frac{\varepsilon_{j}}{\varepsilon_{i}}\right)^{(1-1/s)},
+\end{equation*}
+где \(s\) - порядок метода Рунге--Кутта.
+
+С учетом используемых значений имеем:
+\begin{equation*}
+  \frac{n_{i+1}}{n_{i}}=\left(100\right)^{1/5}\simeq2.512, \quad \frac{error_{i}}{error_{i+1}}=\left(100\right)^{(1-1/5)}\simeq39.811.
+\end{equation*}
+
 \subsection*{Случай \(\alpha=1.0\) \(\beta=1.0\)}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
@@ -178,6 +192,14 @@
     \addlegendentry{$x_2$}
   \end{axis}
 \end{tikzpicture}
+\begin{equation*}
+  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.286, \quad
+  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.438.
+\end{equation*}
+\begin{equation*}
+  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=39.248, \quad
+  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=38.420.
+\end{equation*}
 
 \subsection*{Случай \(\alpha=1.0\) \(\beta=5.0\)}
 \begin{tikzpicture}
@@ -188,6 +210,14 @@
     \addlegendentry{$x_2$}
   \end{axis}
 \end{tikzpicture}
+\begin{equation*}
+  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.543, \quad
+  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.504.
+\end{equation*}
+\begin{equation*}
+  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=41.340, \quad
+  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=37.711.
+\end{equation*}
 
 \subsection*{Случай \(\alpha=0.01\) \(\beta=1.0\)}
 \begin{tikzpicture}
@@ -198,16 +228,20 @@
     \addlegendentry{$x_2$}
   \end{axis}
 \end{tikzpicture}
+\begin{equation*}
+  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.467, \quad
+  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.523.
+\end{equation*}
+\begin{equation*}
+  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=42.052, \quad
+  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=36.639.
+\end{equation*}
 
-\subsection*{Сводная таблица}
-\csvautotabular{stats.csv}
-
-
-\addcontentsline{toc}{section}{Список литературы}
-\begin{thebibliography}{99}
-  \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
-  \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
-  \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
-  \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
-\end{thebibliography}
+% \addcontentsline{toc}{section}{Список литературы}
+% \begin{thebibliography}{99}
+%   \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
+%   \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
+%   \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
+%   \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
+% \end{thebibliography}
 \end{document}
