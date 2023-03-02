@@ -40,23 +40,23 @@
 % \end{titlepage}
 
 \section*{Задание}
-Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.25}):
+Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.30}):
 \begin{gather*}
-  \alpha x_{tt}=\left(1+t^2\right)x, \quad t\in(0, \beta),\\
-  \left.x_{t}\right\vert_{t=0}=0,\\
-  \left.x_{t}\right\vert_{t=\beta}=1,\\
-  \alpha \in \{1.0, 0.01\}, \quad \beta \in \{1.0, 5.0\}.
+  \frac{d^2x}{dt^2}=\frac{x}{1+t^4}, \quad t\in(0, +\infty),\\
+  \left.x\right\vert_{t\to\infty}\to1.
 \end{gather*}
 
 \section*{Постановка задачи}
 
 Введем обозначения \(x_1 = x, x_2=\dot{x}\). Тогда задача перепишется в виде:
 \begin{gather}
-  \label{common_system} \begin{cases}\dot{x}_2=\frac{x}{\alpha}\left(t^2+1\right)\\ \dot{x}_1=x_2 \end{cases},\\
-  \label{left_conditions} x_2(0)=0,\\
-  \label{right_conditions} x_2(\beta)=1.
+  \label{common_system} \begin{cases}\dot{x}_2=\frac{x_1}{1+t^4}\\ \dot{x}_1=x_2 \end{cases},\\
+  \label{exp_right_condition} x_1(\infty)=1.
 \end{gather}
-
+Последнее условие неявно влечет за собой требование
+\begin{equation}
+  \label{imp_right_condition} x_2(\infty)=0.
+\end{equation}
 \section*{Методика решения}
 
 \subsection*{Метод Рунге-Кутта}
@@ -112,129 +112,110 @@
 положительная константа избавляющая нас от необходимости проверять, что
 \(err \neq 0\). Например можно взять \(x=0.001 \varepsilon\).
 
+\subsection*{Критерий остановки}
+
+Первое уравнение системы \cref{common_system} при \(t\to\infty\) примет вид
+\begin{equation}
+  \label{stop_cond} \left.\dot{x}_2\right\vert_{t\to\infty}=\frac{1}{\infty}\to 0.
+\end{equation}
+
+При заданном уровне погрешности \(\varepsilon\) мы можем принять, что момент времени \(t_e=t^N\) "равносилен" бесконечности, при условии:
+\begin{equation*}
+  \frac{x^N_1}{1+\left(t^N\right)^4} < \varepsilon
+\end{equation*}
+
+
 \subsection*{Метод стрельбы}
 
-Для краевой задачи \cref{common_system} из краевого условия \cref{left_conditions} имеем
-\begin{equation*}
-  x_2^0=0.
-\end{equation*}
-
-Другое ``начальное'' значения выберем в качестве параметра пристрелки
+Для краевой задачи \cref{common_system} выберем начальные значения неизвестных функций в качестве параметров пристрелки
 
 \begin{equation*}
-  x_1^0=a.
+  x_1^0=a, \quad x_2^0=b
 \end{equation*}
 
-Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=\beta\) получим некоторое решение \(\tilde{x}_1\) и \(\tilde{x}_2\).
+Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=t_e\) получим некоторое решение \(\tilde{x}_1\) и \(\tilde{x}_2\).
 
-Варьируя параметр \(a\) необходимо добиться выполнения краевого условия \cref{right_conditions}:
+Варьируя параметры \(a\) и \(b\) необходимо добиться выполнения краевых условий \cref{exp_right_condition}, \cref{imp_right_condition}:
 \begin{equation*}
-  \tilde{x}_2(\beta)=x_2^N=1.
+  \tilde{x}_1(t_e)=x_1^N=1, \quad \tilde{x}_2(t_e)=x_2^N=0
 \end{equation*}
 
-Будем искать параметр \(a\) методом простых итераций. Введём функцию \(\phi\) показывающую отклонение от заданного
+Будем искать параметры \(a\) и \(b\) методом простых итераций. Введём
+функции \(\phi_1\) и \(\phi_2\) показывающие отклонение от заданного
 граничного условия:
-\begin{equation*}
-  \phi(a)=x_2^N-1.
-\end{equation*}
-
-Разложив эту функцию в окрестности точки \((a^{i})\) получим:
-
-\begin{equation*}
-  \phi(a)\simeq\phi(a^{i})+\delta a\frac{\partial \phi}{\partial a}(a^{i})\simeq0,
-\end{equation*}
-
-где \(\delta a=a^{i+1}-a^{i}\). 
-
-Тогда итерационный процесс может быть выражен формулой:
-\begin{equation*}
-  a^{i+1}=a^{i}-\phi(a^{i}) / \phi_a(a^{i}).
-\end{equation*}
-
-В случае \(\phi_a(a^{i})=0\) значение \(a\) сбрасывается на случайное из интервала \([-10, 10]\).
-
-\subsection*{Оценка глобальной погрешности}
-Для оценки глобальной погрешности необходимо найти логарифмическую норму матрицы \(A=\frac{\partial \vec{f}}{\partial \vec{x}}\):
 \begin{gather*}
-  A=\begin{pmatrix}
-    0                    & 1  \\
-    \frac{t^2+1}{\alpha} & 0
-  \end{pmatrix}, \quad \frac{1}{2}\left(A^T+A\right)=\begin{pmatrix}
-    0                            & \frac{t^2+\alpha+1}{2\alpha} \\
-    \frac{t^2+\alpha+1}{2\alpha} & 0
-  \end{pmatrix}\Rightarrow\\
-  \Rightarrow \lambda=\pm\frac{t^2+\alpha+1}{2\alpha}.\\
-  \mu(A) = \lambda_{\max}=\frac{t^2+\alpha+1}{2\alpha}.
+  \phi_1(a,b)=x_1^N-1=0\\
+  \phi_2(a,b)=_2^N-0=0
 \end{gather*}
+
+Разложив эти функции в окрестности точки \((a^i, b^i)\) получим:
+
+\begin{gather*}
+  \phi_1(a,b)\simeq\phi_1(a^i,b^i)+\delta a\frac{\partial \phi_1}{\partial a}(a^i,b^i)+\delta b\frac{\partial \phi_1}{\partial b}(a^i,b^i)\simeq0\\
+  \phi_2(a,b)\simeq\phi_2(a^i,b^i)+\delta a\frac{\partial \phi_2}{\partial a}(a^i,b^i)+\delta b\frac{\partial \phi_2}{\partial b}(a^i,b^i)\simeq0
+\end{gather*}
+
+где \(\delta z=z^{i+1}-z^{i}\). В матричном виде уравнения примут вид
+
+\begin{equation*}
+  \begin{pmatrix} 
+    \frac{\partial \phi_1}{\partial a}(a^i,b^i)&\frac{\partial \phi_1}{\partial b}(a^i,b^i)\\
+    \frac{\partial \phi_2}{\partial a}(a^i,b^i)&\frac{\partial \phi_2}{\partial b}(a^i,b^i)
+  \end{pmatrix} \cdot \begin{pmatrix}
+    \delta a\\
+    \delta b
+  \end{pmatrix} =W\cdot\begin{pmatrix}
+    \delta a\\
+    \delta b
+  \end{pmatrix} = -\begin{pmatrix}
+    \phi_1(a^i,b^i)\\
+    \phi_2(a^i,b^i)
+  \end{pmatrix}
+\end{equation*}
+
+Тогда итерационный процесс может быть выражен формулой
+
+\begin{equation*}
+  \begin{pmatrix}
+    a^{i+1}\\
+    b^{i+1}
+  \end{pmatrix}=\begin{pmatrix}
+    a^{i}\\
+    b^{i}
+  \end{pmatrix}-W^{-1}\cdot \begin{pmatrix}
+    \phi_1(a^i,b^i)\\
+    \phi_2(a^i,b^i)
+  \end{pmatrix}
+\end{equation*}
+
+В случае \(\det\vert W\vert=0\) значения сбрасывались на случайные из интервала \([-10, 10]\).
 
 \section*{Результаты}
 
-\subsection*{Сводная таблица}
 \csvautotabular{stats.csv}
 
-Для каждого набора параметров \(\alpha\) и \(\beta\) должно быть выполнено:
-\begin{equation*}
-  \frac{n_{i}}{n_{j}}=\left(\frac{\varepsilon_{i}}{\varepsilon_{j}}\right)^{1/s}, \quad \frac{error_{i}}{error_{j}}=\left(\frac{\varepsilon_{j}}{\varepsilon_{i}}\right)^{(1-1/s)},
-\end{equation*}
+С учетом используемого шага погрешности должно быть выполнено следующее:
+\begin{gather*}
+  \frac{n_{i+1}}{n_{i}}=\left(\frac{\varepsilon_{i+1}}{\varepsilon_{i}}\right)^{1/s}=\left(100\right)^{1/5}\simeq2.512, \\
+  \frac{error_{i}}{error_{i+1}}=\left(\frac{\varepsilon_{i}}{\varepsilon_{i+1}}\right)^{(1-1/s)}=\left(100\right)^{(1-1/5)}\simeq39.811,
+\end{gather*}
 где \(s\) - порядок метода Рунге--Кутта.
 
-С учетом используемых значений имеем:
-\begin{equation*}
-  \frac{n_{i+1}}{n_{i}}=\left(100\right)^{1/5}\simeq2.512, \quad \frac{error_{i}}{error_{i+1}}=\left(100\right)^{(1-1/5)}\simeq39.811.
-\end{equation*}
-
-\subsection*{Случай \(\alpha=1.0\) \(\beta=1.0\)}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b1.0.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {data.csv};
     \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b1.0.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {data.csv};
     \addlegendentry{$x_2$}
   \end{axis}
 \end{tikzpicture}
 \begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.286, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.438.
+  \frac{\left.n\right\vert_{\varepsilon=10^{-7}}}{\left.n\right\vert_{\varepsilon=10^{-5}}}=2.708, \quad
+  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.569.
 \end{equation*}
 \begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=39.248, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=38.420.
-\end{equation*}
-
-\subsection*{Случай \(\alpha=1.0\) \(\beta=5.0\)}
-\begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b5.0.csv};
-    \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b5.0.csv};
-    \addlegendentry{$x_2$}
-  \end{axis}
-\end{tikzpicture}
-\begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.543, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.504.
-\end{equation*}
-\begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=41.340, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=37.711.
-\end{equation*}
-
-\subsection*{Случай \(\alpha=0.01\) \(\beta=1.0\)}
-\begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a0.01_b1.0.csv};
-    \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a0.01_b1.0.csv};
-    \addlegendentry{$x_2$}
-  \end{axis}
-\end{tikzpicture}
-\begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.467, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.523.
-\end{equation*}
-\begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=42.052, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=36.639.
+  \frac{\left.error\right\vert_{\varepsilon=10^{-5}}}{\left.error\right\vert_{\varepsilon=10^{-7}}}=44.422, \quad
+  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=13.125.
 \end{equation*}
 
 % \addcontentsline{toc}{section}{Список литературы}
