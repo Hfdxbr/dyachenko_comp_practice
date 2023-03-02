@@ -5,16 +5,9 @@ LINKFLAGS = $(CPPFLAGS)
 report: clean_data latex clean_tex clean_cpp
 
 prepare_data: build
-	./main 1.0 1.0 1e-7
-	./main 1.0 1.0 1e-9
-	./main 1.0 1.0 1e-11 print
-	./main 1.0 5.0 1e-7
-	./main 1.0 5.0 1e-9
-	./main 1.0 5.0 1e-11 print
-	./main 0.01 1.0 1e-7
-	./main 0.01 1.0 1e-9
-	./main 0.01 1.0 1e-11 print
-	echo "0.01,5.0,-,-,-,-" >>stats.csv
+	./main 1e-7
+	./main 1e-9
+	./main 1e-11 print
 
 build: main.o
 	${GCC} $? -o main $(LINKFLAGS)
