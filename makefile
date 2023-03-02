@@ -5,9 +5,9 @@ LINKFLAGS = $(CPPFLAGS)
 report: clean_data latex clean_tex clean_cpp
 
 prepare_data: build
-	./main 1e-7
+	./main 1e-5
+	./main 1e-7 print
 	./main 1e-9
-	./main 1e-11 print
 
 build: main.o
 	${GCC} $? -o main $(LINKFLAGS)

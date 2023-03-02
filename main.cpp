@@ -159,7 +159,7 @@ void execute(double x10, double x20) {
   ofs_stats << std::setprecision(8) << std::fixed;
   PrintHelper ph(ofs_stats, "", "\n", ",");
   if (!stats_exists)
-    ph.print("\\(\\varepsilon\\)", "n", "\\(x_1(0)\\)", "\\(x_2(0)\\)", "\\(x_2(\\infty)\\)", "\\(error\\)");
+    ph.print("\\(\\varepsilon\\)", "n", "\\(x_1(0)\\)", "\\(x_2(0)\\)", "\\(x_1(\\infty)\\)", "\\(error\\)");
 
   double error = 0;
   Solution sol = shooting(x10, x20, error);
@@ -167,7 +167,7 @@ void execute(double x10, double x20) {
   if (print_data)
     print_points(sol, "data.csv");
   const auto [x1, x2] = sol.back().second.as_tuple();
-  ph.print(to_string(eps, 1, std::scientific), sol.size(), x10, x20, x2, to_string(error, 3, std::scientific));
+  ph.print(to_string(eps, 1, std::scientific), sol.size(), x10, x20, x1, to_string(error, 3, std::scientific));
 }
 
 int main(int argc, char* argv[]) {
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
   if (argc == 3 && argv[2] == "print"s)
     print_data = true;
   double x10 = 1.0;
-  double x20 = 1.0;
+  double x20 = -1.0;
   execute(x10, x20);
 
   return 0;
