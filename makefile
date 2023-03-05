@@ -11,6 +11,7 @@ prepare_data: build
 	./main 51 51 1.0 0.1
 	./main 101 101 1.0 0.1
 	./main 201 201 1.0 0.1
+	/bin/python3 relation.py
 
 build: main.o
 	${GCC} $? -o main $(LINKFLAGS)
