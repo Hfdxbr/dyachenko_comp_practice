@@ -28,31 +28,206 @@
 \newcommand{\Seminar}{\UpdateMe{НАЗВАНИЕ-ПРАКТИКУМА}}
 
 \begin{document}
-\begin{titlepage}
-    \centering
-    {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
-    \vfill
-    {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
-    \vfill
-    \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
-    \vfill
-    {\large Москва, \the\year{}\par}
-\end{titlepage}
+% \begin{titlepage}
+%   \centering
+%   {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
+%   \vfill
+%   {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
+%   \vfill
+%   \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
+%   \vfill
+%   {\large Москва, \the\year{}\par}
+% \end{titlepage}
 
 \section*{Задание}
-\UpdateMe{Описание задачи}
+Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~3.2}):
+\begin{gather*}
+  \frac{\partial u}{\partial t}=\frac{1}{x} \frac{\partial}{\partial x}\left(x \frac{\partial u}{\partial x}\right) + \alpha u + 1,\\
+  \left.\frac{\partial u}{\partial x}\right\vert_{x=0}=0,\\
+  \left.u\right\vert_{x=1}=0,\\
+  \left.u\right\vert_{t=0}=0.5(1-x^2),\\
+  x \in [0, 1], \quad t \in [0, 1], \quad \alpha \in \{1.0, 0.0\},
+\end{gather*}
+и вычислить значения следующих функционалов:
+\begin{gather*}
+  f_1(t) = \int_{0}^{1}{x u(x, t) dx},\\
+  f_2(t) = \left.\frac{\partial u}{\partial x}\right\vert_{x=1}.
+\end{gather*}
 
-\section*{Теория}
-\UpdateMe{Обозначения, основные конструкции, мат. постановка задачи}
+\section*{Методика решения}
 
+Введем равномерную сетку \(\Omega=\{(x_{i}, t_{j})=(ih, j\tau): i \in 0..N-1 \quad j\in 0..M-1\}\), где \(h=1/(N-1)\) и \(\tau=1/(M-1)\).\\
+Будем искать решение в виде сеточной функции, определенной в каждом узле сетки \(u(x_{i},t_{j})=u_{i}^{j}\).
+
+\subsection*{Разностная схема}
+Введем обозначения для операторов разностных пространственных производных
+\begin{gather*}
+  D_{+}u_{i}^{j}=\frac{u_{i+1}^{j}-u_{i}^{j}}{h}, \quad D_{-}u_{i}^{j}=\frac{u_{i}^{j}-u_{i-1}^{j}}{h}
+\end{gather*}
+Будем использовать схему Кранка-Николсона, которая с учетом введенных обозначений примет слеюущий вид:
+\begin{multline}\label{scheme}
+  \frac{u_{i}^{j+1}-u_{i}^{j}}{\tau}=\frac{1}{2 x_{i} h }\left(x_{i+0.5}D_{+}u_{i}^{j+1}-x_{i-0.5}D_{-}u_{i}^{j+1}\right)+\\
+  +\frac{1}{2 x_{i} h }\left(x_{i+0.5}D_{+}u_{i}^{j}-x_{i-0.5}D_{-}u_{i}^{j}\right)+\alpha\frac{u_{i}^{j+1}+u_{i}^{j}}{2}+1.
+\end{multline}
+
+\subsection*{Порядок аппроксимации}
+
+Разложим входящие в уравнение \cref{scheme} значения сеточной функции в ряд Тейлора в точке \((x_i, t_j)\):
+\begin{gather*}
+  u_{i\pm1}^{j}=u(x_{i}\pm h, t_{j})=u \pm h u_x +\frac{1}{2} h^2 u_{xx} \pm \frac{1}{6} h^3 u_{xxx} + \frac{1}{24} h^4 u_{xxxx} + o(h^{4}),\\
+  u_{i}^{j+1}=u(x_{i}, t_{j}+\tau)=u + \tau u_t +\frac{1}{2} \tau^2 u_{tt} \pm \frac{1}{6} \tau^3 u_{ttt} + \frac{1}{24} \tau^4 u_{tttt} + o(\tau^{4}),\\
+  \begin{split}
+    u_{i\pm1}^{j+1}=u(x_{i}\pm h,t_{j}+\tau)=u+\tau  u_t+\frac{1}{2} \tau ^2 u_{tt}+h u_x+\frac{1}{2} h^2 u_{xx}+h \tau  u_{xt}+\frac{1}{2} h \tau ^2 u_{xtt}+\\
+    +\frac{1}{2} h^2 \tau  u_{xxt}+\frac{1}{6} h^3 u_{xxx}+\frac{1}{4} h^2 \tau ^2 u_{xxtt}+\frac{1}{6} h^3 \tau  u_{xxxt}+\frac{1}{24} h^4 u_{xxxx}+\frac{1}{12} h^3 \tau ^2 u_{xxxtt}+\\
+    +\frac{1}{24} h^4 \tau  u_{xxxxt}+h^3 o \tau ^5+\frac{1}{48} h^4 \tau ^2 u_{xxxxtt}+o(h^4, \tau^2)
+  \end{split}
+\end{gather*}
+
+Подставив данные выражения в \cref{scheme} получим
+\begin{equation*}
+  u_{t}+\frac{\tau}{2} u_{tt} = \frac{1}{x}\left(x u_{x}\right)_{x} + \frac{\tau}{2} \frac{1}{x}\left(x u_{xt}\right)_{x} + \alpha \left(u + \frac{\tau}{2} u_{t}\right) + 1 + O(h^2, \tau^2).
+\end{equation*}
+Выразив \(u_{t}\) и \(u_{tt}\) из исходного уравнения получим что порядок аппроксимации равен \(O(h^2, \tau^2)\).
+
+\subsection*{Устойчивость}
+
+Так как схема линейна, то уравнение ошибок будет совпадать с уравнением \cref{scheme} с точностью до замены \(u_{i}^{j}\rightarrow\delta_{i}^{j}\) и отбрасывания свободных членов.
+
+Выполним замену \(\delta_{m}^{n}=\lambda^{n} e^{i m \phi}\), после чего поделим обе части на \(\lambda^{n} e^{i m \phi}\):
+\begin{multline*}
+  \frac{(\lambda -1)}{\tau }=\frac{e^{-i \phi } \left(-1+e^{i \phi }\right) \lambda \left(-x_{m-0.5}+e^{i \phi } x_{m+0.5}\right)}{2 h^2 x_m}+\\
+  +\frac{e^{-i\phi } \left(-1+e^{i \phi }\right) \left(-x_{m-0.5}+e^{i \phi } x_{m+0.5}\right)}{2 h^2 x_m}+\frac{1}{2} \left(e^{i m \phi } \lambda +e^{i m \phi }\right)
+\end{multline*}
+Выразив \(\lambda\) получим
+\begin{equation*}
+  \lambda=-1-\frac{2 h^2 (\tau +2) e^{i \phi } x_m}{e^{i \phi } \left(h^2 x_m \left(-2+\tau  e^{i m \phi }\right)+\tau  \left(-1+e^{i \phi }\right) x_{m+0.5}\right)-\tau \left(-1+e^{i \phi }\right) x_{m-0.5}},
+\end{equation*}
+то есть \(\left|\lambda\right| < 1 + O(\tau)\), и следовательно схема устойчива.
+
+\subsection*{Система уравнений}
+
+Выразим из уравнения \cref{scheme} неизвестные \(u_{*}^{j+1}\), а так же обозначим
+\begin{gather*}
+  A_{i} = -\frac{x_{i-0.5}}{x_{i}}\frac{1}{2h^2},\\
+  B_{\pm} = \frac{1}{\tau}\pm\frac{1}{h^2}+\frac{\alpha}{2},\\
+  C_{i} = -\frac{x_{i+0.5}}{x_{i}}\frac{1}{2h^2},
+\end{gather*}
+что даст нам короткую запись
+\begin{equation}\label{eq}
+  A_i u_{i-1}^{j+1} + B_{+} u_{i}^{j+1} + C_{i} u_{i+1}^{j+1} = -A_i u_{i-1}^{j} + B_{-} u_{i}^{j} - C_{i} u_{i+1}^{j} + 1 = f_{i}^{j}.
+\end{equation}
+Так же из граничных условий имеем:
+\begin{gather}
+  \label{cond}-3 u_{0}^{*} + 4u_{1}^{*}-u_{2}^{*}=0,\\
+  u_{N-1}^{*}=0.
+\end{gather}
+
+Окончательно (подставив \cref{cond} в \cref{eq} при \(i=1\)) получаем
+\begin{align*}
+   & u_{0}^{j+1} = \frac{4}{3}u_{1}^{j+1} - \frac{1}{3} u_{2}^{j+1},                                                      \\
+   & \begin{cases}
+       \left(B_{+} + \frac{4}{3}A_{1}\right) u_{1}^{j+1} + \left(C_{1}- \frac{1}{3}A_{1}\right) u_{2}^{j+1} = f_{1}^{j}, \\
+       A_i u_{i-1}^{j+1} + B_{+} u_{i}^{j+1} + C_{i} u_{i+1}^{j+1} =  f_{i}^{j}, \quad i=2..N-2,                         \\
+       u_{N-1}^{j+1}=0.
+     \end{cases}
+\end{align*}
+Последняя система допускает решение методом прогонки, после чего из найденных значений выражается \(u_{0}^{*}\).
 \section*{Результаты}
-\UpdateMe{Полученные результаты}
+Были рассмотрены следюущие варианты сеток: \(M=N=51\), \(M=N=101\) и \(M=N=201\).
 
-\addcontentsline{toc}{section}{Список литературы}
-\begin{thebibliography}{99}
-  \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
-  \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
-  \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
-  \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
-\end{thebibliography}
+\subsection*{Случай \(\alpha=0.0\)}
+
+\subsubsection*{\(M=N=51\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.0_N51_M51.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.0_N51_M51.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a0.0_N51_M51.csv}
+
+\subsubsection*{\(M=N=101\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.0_N101_M101.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.0_N101_M101.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a0.0_N101_M101.csv}
+
+\subsubsection*{\(M=N=201\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.0_N201_M201.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.0_N201_M201.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a0.0_N201_M201.csv}
+
+\subsection*{Случай \(\alpha=1.0\)}
+
+\subsubsection*{\(M=N=51\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_N51_M51.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_N51_M51.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_N51_M51.csv}
+
+\subsubsection*{\(M=N=101\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_N101_M101.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_N101_M101.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_N101_M101.csv}
+
+\subsubsection*{\(M=N=201\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_N201_M201.csv};
+    \addlegendentry{$f_1$}
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_N201_M201.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_N201_M201.csv}
+
+% \addcontentsline{toc}{section}{Список литературы}
+% \begin{thebibliography}{99}
+%   \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
+%   \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
+%   \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
+%   \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
+% \end{thebibliography}
 \end{document}
