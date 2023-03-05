@@ -5,12 +5,12 @@ LINKFLAGS = $(CPPFLAGS)
 report: clean_data latex clean_tex clean_cpp
 
 prepare_data: build
-	./main 50 50 1.0
-	./main 100 100 1.0
-	./main 200 200 1.0
-	./main 50 50 0.0
-	./main 100 100 0.0
-	./main 200 200 0.0
+	./main 51 51 1.0
+	./main 101 101 1.0
+	./main 201 201 1.0
+	./main 51 51 0.0
+	./main 101 101 0.0
+	./main 201 201 0.0
 
 build: main.o
 	${GCC} $? -o main $(LINKFLAGS)

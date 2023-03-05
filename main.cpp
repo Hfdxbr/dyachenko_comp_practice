@@ -88,20 +88,32 @@ void solve_next(double h, double tau, Points& u) {
 
 void process(int N, int M) {
   double h = 1.0 / (N - 1);
-  double tau = 0.5 / (M - 1);
+  double tau = 1.0 / (M - 1);
   Points u(N);
 
-  std::ofstream ofs("data_a" + std::to_string(alpha) + "_N" + std::to_string(N) + "_M" + std::to_string(M) + ".csv");
+  std::ofstream ofs("fs_a" + to_string(alpha, 1) + "_N" + std::to_string(N) + "_M" + std::to_string(M) + ".csv");
+  std::ofstream ou("u_a" + to_string(alpha, 1) + "_N" + std::to_string(N) + "_M" + std::to_string(M) + ".csv");
   ofs << "t,f1,f2\n";
+  ou << "\\(t\\),\\(\\left.u\\right\\vert_{x=0.0}\\),\\(\\left.u\\right\\vert_{x=0.2}\\),\\(\\left.u\\right\\vert_{x=0.4}\\),\\(\\left.u\\right\\vert_{x=0.6}\\),\\(\\left.u\\right\\vert_{x=0.8}\\),\\(\\left.u\\right\\vert_{x=1.0}\\)\n";
   for (int i = 0; i < N; ++i)
     u[i] = 0.5 * (1. - i * i * h * h);
 
   ofs << 0 << "," << f1(u, h) << "," << f2(u, h) << "\n";
+  ou << 0;
+  for (int i = 0; i < N; i += N / 5)
+    ou << "," << u[i];
+  ou << "\n";
 
   for (int j = 1; j < M; ++j) {
     solve_next(h, tau, u);
 
     ofs << j * tau << "," << f1(u, h) << "," << f2(u, h) << "\n";
+    if (j % (M / 10) == 0) {
+      ou << j * tau;
+      for (int i = 0; i < N; i += N / 5)
+        ou << "," << u[i];
+      ou << "\n";
+    }
   }
 }
 
