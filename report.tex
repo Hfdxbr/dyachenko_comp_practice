@@ -61,10 +61,11 @@
 Будем искать решение в виде сеточной функции, определенной в каждом узле сетки \(u(x_{i},t_{j})=u_{i}^{j}\).
 
 \subsection*{Разностная схема}
-Будем использовать схему Кранка-Николсона, которая имеет слеюущий вид:
-\begin{equation}\label{scheme}
-  \frac{u_{i}^{j+1}-u_{i}^{j}}{\tau}=\frac{\alpha}{2}\left(\frac{u_{i+1}^{j+1}-2u_{i}^{j+1}+u_{i-1}^{j+1}}{h^2}\right) + \frac{\alpha}{2}\left(\frac{u_{i+1}^{j}-2u_{i}^{j}+u_{i-1}^{j}}{h^2}\right) + \left(u_{i}^{j}\right)^4.
-\end{equation}
+Будем использовать модицифированную схему Кранка-Николсона, которая имеет следующий вид:
+\begin{multline}\label{scheme}
+  \frac{u_{i}^{j+1}-u_{i}^{j}}{\tau}=\alpha\left(\frac{u_{i+1}^{j+1}-2u_{i}^{j+1}+u_{i-1}^{j+1}}{2h^2}+\frac{u_{i+1}^{j}-2u_{i}^{j}+u_{i-1}^{j}}{2h^2}\right) + \\
+  + \left(2u_{i}^{j+1}-u_{i}^{j}\right)\left(u_{i}^{j}\right)^3.
+\end{multline}
 
 \subsection*{Порядок аппроксимации}
 
@@ -73,81 +74,99 @@
   u_{i\pm1}^{j}=u(x_{i}\pm h, t_{j})=u \pm h u_x +\frac{1}{2} h^2 u_{xx} \pm \frac{1}{6} h^3 u_{xxx} + O(h^{4}),\\
   u_{i}^{j+1}=u(x_{i}, t_{j}+\tau)=u + \tau u_t +\frac{1}{2} \tau^2 u_{tt} \pm \frac{1}{6} \tau^3 u_{ttt} + O(\tau^{4}),\\
   \begin{split}
-    u_{i\pm1}^{j+1}=u(x_{i}\pm h,t_{j}+\tau)=u+\tau  u_t+\frac{1}{2} \tau ^2 u_{tt}+h u_x+\frac{1}{2} h^2 u_{xx}+h \tau  u_{xt}+\frac{1}{2} h \tau ^2 u_{xtt}+\\
-    +\frac{1}{2} h^2 \tau  u_{xxt}+\frac{1}{6} h^3 u_{xxx}+\frac{1}{4} h^2 \tau ^2 u_{xxtt}+\frac{1}{6} h^3 \tau  u_{xxxt}+\frac{1}{24} h^4 u_{xxxx}+\frac{1}{12} h^3 \tau ^2 u_{xxxtt}+\\
+    u_{i\pm1}^{j+1}=u(x_{i}\pm h,t_{j}+\tau)=u+\tau  u_t+\frac{1}{2} \tau ^2 u_{tt}\pm h u_x+\frac{1}{2} h^2 u_{xx}\pm h \tau  u_{xt}\pm \frac{1}{2} h \tau ^2 u_{xtt}+\\
+    +\frac{1}{2} h^2 \tau  u_{xxt}\pm \frac{1}{6} h^3 u_{xxx}+\frac{1}{4} h^2 \tau ^2 u_{xxtt}\pm \frac{1}{6} h^3 \tau  u_{xxxt}+\frac{1}{24} h^4 u_{xxxx}\pm \frac{1}{12} h^3 \tau ^2 u_{xxxtt}+\\
     +\frac{1}{24} h^4 \tau  u_{xxxxt}+O(h^4, \tau^2)
   \end{split}
 \end{gather*}
 
 Подставив данные выражения в \cref{scheme} получим
 \begin{equation*}
-  u_{t}+\frac{\tau}{2} u_{tt} = \alpha u_{xx} + \frac{\tau}{2} \alpha u_{xxt} + u^4 + O(h^2, \tau^2).
+  u_{t}+\frac{\tau}{2} u_{tt} = \alpha u_{xx} + \frac{\tau}{2} \alpha u_{xxt} + u^4 + 2 \tau u^3 u_{t} + O(h^2, \tau^2).
 \end{equation*}
-Выразив \(u_{t}\) и \(u_{tt}\) из исходного уравнения увидим, что нелинейный член не дает повысить порядок аппроксимации, который в итоге равен \(O(h^2, \tau)\).
+Выразив \(u_{t}\) и \(u_{tt}\) из исходного уравнения, с учетом \(u^3 u_{t}=\frac{1}{4}\left(u^4\right)_t\) получим, что порядок аппроксимации равен \(O(h^2, \tau^2)\).
 
 \subsection*{Устойчивость}
 
 Рассмотрим значения в узлах сетки как \(u_{i}^{j} = \bar{u}_{i}^{j} + \delta_{i}^{j}\), где \(\bar{u}\) - истинное решение, а \(\delta\) - ошибка. Подставим данные выражения в уравнение \cref{scheme} и рассмотрим уравнение относительно ошибок. Будучи линеаризованным оно примет вид:
-\begin{equation*}
-  \frac{\delta_{i}^{j+1}-\delta_{i}^{j}}{\tau}=\frac{\alpha}{2}\left(\frac{\delta_{i+1}^{j+1}-2\delta_{i}^{j+1}+\delta_{i-1}^{j+1}}{h^2}\right) + \frac{\alpha}{2}\left(\frac{\delta_{i+1}^{j}-2\delta_{i}^{j}+\delta_{i-1}^{j}}{h^2}\right) + 4\delta_{i}^{j} \left(u_{i}^{j}\right)^3.
-\end{equation*}
+\begin{multline*}
+  \frac{\delta _{i}^{j+1}-\delta _{i}^{j}}{\tau }=\alpha  \left(\frac{\delta _{i-1}^{j}-2 \delta _{i}^{j}+\delta _{i+1}^{j}}{2 h^2}+\frac{\delta _{i-1}^{j+1}-2 \delta _{i}^{j+1}+\delta
+    _{i+1}^{j+1}}{2 h^2}\right)+ \\
+  + \left(2 \delta _{i}^{j+1}-\delta _{i}^{j}\right) \left(u_{i}^{j}\right)^3+3 \delta _{i}^{j} \left(2 u_{i}^{j+1}-u_{i}^{j}\right) \left(u_{i}^{j}\right)^2
+\end{multline*}
 
 Выполним замену \(\delta_{m}^{n}=\lambda^{n} e^{i m \phi}\), после чего поделим обе части на \(\lambda^{n} e^{i m \phi}\):
 \begin{equation*}
-  \frac{\lambda -1}{\tau }=4 u^3+\frac{\alpha  (\lambda +1) e^{-i \phi } \left(-1+e^{i \phi }\right)^2}{2 h^2}.
+  \frac{\lambda -1}{\tau }=\frac{\alpha  (\lambda +1) e^{-i \phi } \left(-1+e^{i \phi }\right)^2}{2 h^2}+(2 \lambda -1) \left(u_{m}^{n}\right){}^3+3 \left(2
+  u_{m}^{n+1}-u_{m}^{n}\right) \left(u_{m}^{n}\right){}^2.
 \end{equation*}
 Выразив \(\lambda\) получим
 \begin{equation*}
-  \lambda = -1 + \frac{2 h^2 \tau \left(2 u^3+1\right)}{-\alpha  \tau  \cos (\phi )+\alpha  \tau +h^2},
+  \lambda = 1 + 2 \tau \frac{-\alpha  \cos (\phi )+\alpha +h^2 \left(u_{m}^{n}-3 u_{m}^{n+1}\right) \left(u_{m}^{n}\right){}^2}{\alpha  \tau  \cos (\phi )-\alpha  \tau +2 h^2 \tau
+    \left(u_{m}^{n}\right)^3-h^2},
 \end{equation*}
 то есть \(\left|\lambda\right| < 1 + O(\tau)\), и следовательно схема устойчива.
 
 \subsection*{Система уравнений}
 
-Выразим из уравнения \cref{scheme} неизвестные \(\delta_{*}^{j+1}\), а так же обозначим
+Выразим из уравнения \cref{scheme} неизвестные \(u_{*}^{j+1}\), а так же обозначим
 \begin{gather*}
-  A = -\frac{1}{2h^2},\\
-  B_{\pm} = \frac{1}{\tau}\pm\frac{1}{h^2},\\
-  C = -\frac{1}{2h^2},
+  A = C = -\frac{\alpha}{2h^2},\\
+  B_{i}^{j} = \frac{1}{\tau}-\frac{\alpha}{h^2} - 2 \left(u_{i}^{j}\right)^3,\\
+  \hat{B}_{i}^{j} = \frac{1}{\tau}+\frac{\alpha}{h^2} - \left(u_{i}^{j}\right)^3,
 \end{gather*}
 что даст нам короткую запись
 \begin{equation}\label{eq}
-  A u_{i-1}^{j+1} + B_{+} u_{i}^{j+1} + C u_{i+1}^{j+1} = -A u_{i-1}^{j} + B_{-} u_{i}^{j} - C u_{i+1}^{j} + \left(u_{i}^{j}\right)^4 = f_{i}^{j}.
+  A u_{i-1}^{j+1} + B_{i}^{j} u_{i}^{j+1} + C u_{i+1}^{j+1} = -A u_{i-1}^{j} + \hat{B}_{i}^{j} u_{i}^{j} - C u_{i+1}^{j}=f_{i}^{j}.
 \end{equation}
-Так же из граничных условий имеем:
-\begin{gather}
-  \label{lcond}-3 u_{0}^{j} + 4u_{1}^{j}-u_{2}^{j}=0,\\
-  \label{rcond}\frac{1}{2}\mathfrak{D} u_{N-1}^{j} + \frac{1}{2}\mathfrak{D} u_{N-1}^{j+1} + 50\left(u_{N-1}^{j}\right)^4=0,
-\end{gather}
-где \(\mathfrak{D} u_{i}^{j}=\frac{3 u_{i}^{j} - 4u_{i-1}^{j}+u_{i-2}^{j}}{2h}\).
 
-Окончательно (подставив \cref{lcond} в \cref{eq} при \(i=1\) и \cref{rcond} в \cref{eq} при \(i=N-2\)) получаем
-\begin{align*}
-   & u_{0}^{j+1} = \frac{4}{3}u_{1}^{j+1} - \frac{1}{3} u_{2}^{j+1},                                                                         \\
-   & \begin{cases}
-       \left(B_{+} + \frac{4}{3}A\right) u_{1}^{j+1} + \left(C - \frac{1}{3}A\right) u_{2}^{j+1} = f_{1}^{j},               \\
-       A u_{i-1}^{j+1} + B_{+} u_{i}^{j+1} + C u_{i+1}^{j+1} =  f_{i}^{j}, \quad i=2..N-3,                                  \\
-       \left(A - \frac{1}{3}C\right) u_{N-3}^{j+1} + \left(B_{+} + \frac{4}{3}C\right) u_{N-2}^{j+1} = \tilde{f}_{N-2}^{j}, \\
-       \tilde{f}_{N-2}^{j} = f_{N-2}^{j} - C\left(\frac{1}{2}\mathfrak{D} u_{N-1}^{j} + 50\left(u_{N-1}^{j}\right)^4\right),
-     \end{cases} \\
-   & u_{N-1}^{j+1}= 4u_{N-2}^{j+1} - u_{N-3}^{j+1}-\frac{4h}{2}\mathfrak{D} u_{N-1}^{j+1} + 4h50\left(u_{N-1}^{j}\right)^4 
-\end{align*}
-Последняя система допускает решение методом прогонки, после чего из найденных значений выражаются \(u_{0}^{*}\) и \(u_{N-1}^{*}\).
+Введем допольнительно фиктивные узлы \(u_{-1}^{*}\) и \(u_{N}^{*}\), которые будут входить в определение граничных условий. Для симметричной записи обозначим \(n=N-1\) и рассмотрим подробнее второе граничное условие: \(\frac{\partial u}{\partial x}+50u^4=0\) при \(x=1\). Для его аппроксимации будем использовать сразу две разностные схемы, одна из которых свяжет два временных слоя:
+\begin{gather}
+  \label{rcond_linear}\frac{u_{n+1}^{j+1}-u_{n-1}^{j+1}}{2h}+50\left(4u_{n}^{j+1}-3u_{n}^{j}\right)\left(u_{n}^{j}\right)^3=0,\\
+  \label{rcond}\frac{u_{n+1}^{j}-u_{n-1}^{j}}{2h}+50 \left(u_{n}^{j}\right)^4 =0.
+\end{gather}
+Данные разностные схемы сохраняют порядок аппроксимации \(O(h^2,\
+tau^2)\), причём уравнение \cref{rcond_linear} линйено относительно \(u_{*}^{j+1}\).
+
+Для первого граничного условия имеем
+\begin{equation}\label{lcond}
+  \frac{u_{1}^{j+1}-u_{-1}^{j+1}}{2h}=0.
+\end{equation}
+
+
+Окончательно, подставив \(u_{-1}^{j+1}\) из \cref{lcond} в \cref{eq} при \(i=0\) и \(u_{n+1}^{j+1}\) из \cref{rcond_linear} и \(u_{n+1}^{j}\) из \label{rcond} в \cref{eq} при \(i=n=N-1\), получаем
+\begin{equation*}
+  \begin{cases}
+    B_{0}^{j} u_{0}^{j+1} + \left(A + C\right) u_{1}^{j+1} = f_{0}^{j},                     \\
+    A u_{i-1}^{j+1} + B_{i}^{j} u_{i}^{j+1} + C u_{i+1}^{j+1} =  f_{i}^{j}, \quad i=1..N-2, \\
+    \left(A + C\right) u_{N-2}^{j+1} + \left(B_{N-1}^{j} - 400 h C \left(u_{N-1}^{j}\right)^3 \right) u_{N-1}^{j+1} = \hat{f}_{N-1}^{j},
+  \end{cases}
+\end{equation*}
+где \(\hat{f}_{N-1}^{j}=f_{N-1}^{j}-200 h C \left(u_{N-1}^{j}\right)^4\).
+
+Матрица данной системы является трехдиагональной и допускает решение методом прогонки.
+
 \section*{Результаты}
-Были рассмотрены следюущие варианты сеток: \(M=N=51\), \(M=N=101\) и \(M=N=201\).
+Были рассмотрены следующие варианты сеток: \(M=N=51\), \(M=N=101\) и \(M=N=201\).
 
 \subsection*{Случай \(\alpha=0.1\) и \(\beta=0.1\)}
 
 \subsubsection*{Размеры \(M=N=51\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=north west, grid = major, grid style={dashed, gray!30},
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N51_M51.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N51_M51.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a0.1_b0.1_N51_M51.csv}
@@ -155,13 +174,19 @@
 \subsubsection*{Размеры \(M=N=101\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=north west, grid = major, grid style={dashed, gray!30},
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N101_M101.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N101_M101.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a0.1_b0.1_N101_M101.csv}
@@ -169,13 +194,19 @@
 \subsubsection*{Размеры \(M=N=201\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=north west, grid = major, grid style={dashed, gray!30},
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=4}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N201_M201.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N201_M201.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a0.1_b0.1_N201_M201.csv}
@@ -190,13 +221,18 @@
 \subsubsection*{Размеры \(M=N=51\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b0.1_N51_M51.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b0.1_N51_M51.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a1.0_b0.1_N51_M51.csv}
@@ -204,13 +240,18 @@
 \subsubsection*{Размеры \(M=N=101\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b0.1_N101_M101.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b0.1_N101_M101.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a1.0_b0.1_N101_M101.csv}
@@ -218,13 +259,18 @@
 \subsubsection*{Размеры \(M=N=201\)}
 
 \begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b0.1_N201_M201.csv};
     \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b0.1_N201_M201.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
+
 Ниже приведены некоторые значения функции \(u\):
 
 \csvautotabular{u_a1.0_b0.1_N201_M201.csv}
@@ -233,6 +279,70 @@
 Ниже представлена таблица, с отношением значений сеточной функции при различных параметрах сеток \(\left(\frac{u_{M=101,N=101}-u_{M=51,N=51}}{u_{M=201,N=201}-u_{M=101,N=101}}\right)\):
 
 \csvautotabular{rel_a1.0_b0.1.csv}
+
+\subsection*{Случай \(\alpha=1.0\) и \(\beta=1.0\)}
+
+\subsubsection*{Размеры \(M=N=51\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b1.0_N51_M51.csv};
+    \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b1.0_N51_M51.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_b1.0_N51_M51.csv}
+
+\subsubsection*{Размеры \(M=N=101\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b1.0_N101_M101.csv};
+    \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b1.0_N101_M101.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_b1.0_N101_M101.csv}
+
+\subsubsection*{Размеры \(M=N=201\)}
+
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=south west, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a1.0_b1.0_N201_M201.csv};
+    \addlegendentry{$f_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=8cm, height=6cm, legend pos=north east, grid = major, grid style={dashed, gray!30}]
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a1.0_b1.0_N201_M201.csv};
+    \addlegendentry{$f_2$}
+  \end{axis}
+\end{tikzpicture}
+
+Ниже приведены некоторые значения функции \(u\):
+
+\csvautotabular{u_a1.0_b1.0_N201_M201.csv}
+
+\subsubsection*{Таблица отношений}
+Ниже представлена таблица, с отношением значений сеточной функции при различных параметрах сеток \(\left(\frac{u_{M=101,N=101}-u_{M=51,N=51}}{u_{M=201,N=201}-u_{M=101,N=101}}\right)\):
+
+\csvautotabular{rel_a1.0_b1.0.csv}
 
 % \addcontentsline{toc}{section}{Список литературы}
 % \begin{thebibliography}{99}
