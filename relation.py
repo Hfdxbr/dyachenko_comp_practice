@@ -7,7 +7,9 @@ def find_relation(pattern: str):
     dfs = {}
     for file in Path('.').glob(f'u_{pattern}*.csv'):
         N, M = map(lambda x: int(x[1:]), file.stem.split('_')[-2:])
-        dfs[(N, M)] = pd.read_csv(file)
+        df = pd.read_csv(file)
+        dfs[(N, M)] = df
+        df.round(6).to_csv(file, index=False)
     keys = sorted(dfs.keys())
     out = []
     t_col = r'\(t\)'

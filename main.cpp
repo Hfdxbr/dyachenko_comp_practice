@@ -105,6 +105,7 @@ void process(int N, int M) {
   for (auto i : {"0.0", "0.2", "0.4", "0.6", "0.8", "1.0"})
     ou << ",\\(\\left.u\\right\\vert_{x=" << i << "}\\)";
   ou << "\n";
+  ou.precision(12);
   for (int i = 0; i < N; ++i)
     u[i] = beta * std::pow(1. - std::pow(i * h, 2), 2);
 
