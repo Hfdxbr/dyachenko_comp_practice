@@ -31,13 +31,13 @@ double f2(const Points& u, double h) {
   double sum = 0;
   for (int i = 1; i < u.size() - 1; i++)
     sum += std::pow(u[i], 4.);
-  sum += 0.5 * (std::pow(u[0], 4.) + std::pow(u.back(), 4.));
-  return sum * h - 50. * alpha * std::pow(u.back(), 4.);
+  sum += 0.5 * (std::pow(u[0], 4) + std::pow(u.back(), 4));
+  return sum * h - 50. * alpha * std::pow(u.back(), 4);
 }
 
 double A(double h, double tau) { return -alpha / (2. * h * h); }
-double B(double h, double tau, double u_i) { return alpha / (h * h) + 1. / tau - 2. * std::pow(u_i, 3.); }
-double B_hat(double h, double tau, double u_i) { return -alpha / (h * h) + 1. / tau - std::pow(u_i, 3.); }
+double B(double h, double tau, double u_i) { return alpha / (h * h) + 1. / tau - 2. * std::pow(u_i, 3); }
+double B_hat(double h, double tau, double u_i) { return -alpha / (h * h) + 1. / tau - std::pow(u_i, 3); }
 double C(double h, double tau) { return -alpha / (2. * h * h); }
 
 void fill_f(const Points& u, double h, double tau, Points& f) {
@@ -64,7 +64,7 @@ void fill_diags(double h, double tau, Points& As, Points& Bs, Points& Cs, const 
   }
 
   As[i] = A(h, tau) + C(h, tau);
-  Bs[i] = B(h, tau, u[i]) - C(h, tau) * 8. * h * 50. * std::pow(u[i], 3.);
+  Bs[i] = B(h, tau, u[i]) - C(h, tau) * 8. * h * 50. * std::pow(u[i], 3);
   Cs[i] = 0;
 }
 
@@ -106,7 +106,7 @@ void process(int N, int M) {
     ou << ",\\(\\left.u\\right\\vert_{x=" << i << "}\\)";
   ou << "\n";
   for (int i = 0; i < N; ++i)
-    u[i] = beta * std::pow(1. - std::pow(i * h, 2.), 2.);
+    u[i] = beta * std::pow(1. - std::pow(i * h, 2), 2);
 
   ofs << 0 << "," << f1(u, h) << "," << f2(u, h) << "\n";
   ou << 0;
