@@ -22,5 +22,6 @@ def find_relation(pattern: str):
     df.round(6).astype(str).to_csv(f'rel_{pattern}.csv', index=False)
 
 
-find_relation('a0.1_b1.0')
+find_relation('a0.1_b0.1')
 find_relation('a1.0_b0.1')
+find_relation('a1.0_b1.0')

@@ -136,54 +136,54 @@
 \section*{Результаты}
 Были рассмотрены следюущие варианты сеток: \(M=N=51\), \(M=N=101\) и \(M=N=201\).
 
-\subsection*{Случай \(\alpha=0.1\) и \(\beta=1.0\)}
+\subsection*{Случай \(\alpha=0.1\) и \(\beta=0.1\)}
 
 \subsubsection*{Размеры \(M=N=51\)}
 
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b1.0_N51_M51.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N51_M51.csv};
     \addlegendentry{$f_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b1.0_N51_M51.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N51_M51.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
 Ниже приведены некоторые значения функции \(u\):
 
-\csvautotabular{u_a0.1_b1.0_N51_M51.csv}
+\csvautotabular{u_a0.1_b0.1_N51_M51.csv}
 
 \subsubsection*{Размеры \(M=N=101\)}
 
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b1.0_N101_M101.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N101_M101.csv};
     \addlegendentry{$f_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b1.0_N101_M101.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N101_M101.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
 Ниже приведены некоторые значения функции \(u\):
 
-\csvautotabular{u_a0.1_b1.0_N101_M101.csv}
+\csvautotabular{u_a0.1_b0.1_N101_M101.csv}
 
 \subsubsection*{Размеры \(M=N=201\)}
 
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b1.0_N201_M201.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=f1, col sep=comma] {fs_a0.1_b0.1_N201_M201.csv};
     \addlegendentry{$f_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b1.0_N201_M201.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=f2, col sep=comma] {fs_a0.1_b0.1_N201_M201.csv};
     \addlegendentry{$f_2$}
   \end{axis}
 \end{tikzpicture}
 Ниже приведены некоторые значения функции \(u\):
 
-\csvautotabular{u_a0.1_b1.0_N201_M201.csv}
+\csvautotabular{u_a0.1_b0.1_N201_M201.csv}
 
 \subsubsection*{Таблица отношений}
 Ниже представлена таблица, с отношением значений сеточной функции при различных параметрах сеток \(\left(\frac{u_{M=101,N=101}-u_{M=51,N=51}}{u_{M=201,N=201}-u_{M=101,N=101}}\right)\):
 
-\csvautotabular{rel_a0.1_b1.0.csv}
+\csvautotabular{rel_a0.1_b0.1.csv}
 
 \subsection*{Случай \(\alpha=1.0\) и \(\beta=0.1\)}
 

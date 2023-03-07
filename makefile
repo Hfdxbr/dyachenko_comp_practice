@@ -5,12 +5,15 @@ LINKFLAGS = $(CPPFLAGS)
 report: clean_data latex clean_tex clean_cpp
 
 prepare_data: build
-	./main 51 51 0.1 1.0
-	./main 101 101 0.1 1.0
-	./main 201 201 0.1 1.0
+	./main 51 51 0.1 0.1
+	./main 101 101 0.1 0.1
+	./main 201 201 0.1 0.1
 	./main 51 51 1.0 0.1
 	./main 101 101 1.0 0.1
 	./main 201 201 1.0 0.1
+	./main 51 51 1.0 1.0
+	./main 101 101 1.0 1.0
+	./main 201 201 1.0 1.0
 	/bin/python3 relation.py
 
 build: main.o
@@ -33,4 +36,4 @@ clean_data:
 	rm -f *.csv
 
 clean: clean_tex clean_cpp clean_data
-	rm -f report.pdf
+	rm -f report.pdf report.synctex.gz report.fls report.fdb*

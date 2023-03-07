@@ -22,51 +22,55 @@ double beta;
 double f1(const Points& u, double h) {
   double sum = 0;
   for (int i = 1; i < u.size() - 1; i++)
-    sum += u[i] * h;
-  sum += 0.5 * (u[0] * h + u.back() * h);
-  return sum;
+    sum += u[i];
+  sum += 0.5 * (u[0] + u.back());
+  return sum * h;
 }
 
 double f2(const Points& u, double h) {
   double sum = 0;
   for (int i = 1; i < u.size() - 1; i++)
-    sum += std::pow(u[i], 4.) * h;
-  sum += 0.5 * (std::pow(u[0], 4.) * h + std::pow(u.back(), 4.) * h);
-  return sum - 50 * alpha * std::pow(u.back(), 4.);
+    sum += std::pow(u[i], 4.);
+  sum += 0.5 * (std::pow(u[0], 4.) + std::pow(u.back(), 4.));
+  return sum * h - 50. * alpha * std::pow(u.back(), 4.);
 }
 
-double A(double h, double tau) { return -1. / (2. * h * h); }
-double B(double h, double tau) { return 1. / (h * h) + 1. / tau; }
-double B_hat(double h, double tau) { return -1. / (h * h) + 1. / tau; }
-double C(double h, double tau) { return -1. / (2. * h * h); }
+double A(double h, double tau) { return -alpha / (2. * h * h); }
+double B(double h, double tau, double u_i) { return alpha / (h * h) + 1. / tau - 2. * std::pow(u_i, 3.); }
+double B_hat(double h, double tau, double u_i) { return -alpha / (h * h) + 1. / tau - std::pow(u_i, 3.); }
+double C(double h, double tau) { return -alpha / (2. * h * h); }
 
 void fill_f(const Points& u, double h, double tau, Points& f) {
-  for (int i = 1; i < f.size() - 1; ++i)
-    f[i] = -A(h, tau) * u[i - 1] + B_hat(h, tau) * u[i] - C(h, tau) * u[i + 1] + std::pow(u[i], 4.);
+  int i = 0;
+  f[i] = B_hat(h, tau, u[i]) * u[i] - (A(h, tau) + C(h, tau)) * u[i + 1];
 
-  int n = u.size() - 1;
-  double r = (4. * h * std::pow(u[n], 4.) - (3. * u[n] - 4. * u[n - 1] + u[n - 2])) / 3.;
-  f[n - 1] += r * C(h, tau);
+  for (i = 1; i < f.size() - 1; ++i)
+    f[i] = -A(h, tau) * u[i - 1] + B_hat(h, tau, u[i]) * u[i] - C(h, tau) * u[i + 1];
+
+  f[i] = -(A(h, tau) + C(h, tau)) * u[i - 1] + B_hat(h, tau, u[i]) * u[i] -  //
+         C(h, tau) * 4. * h * 50. * std::pow(u[i], 4.);
 }
 
-void fill_diags(double h, double tau, Points& As, Points& Bs, Points& Cs) {
-  for (int i = 1; i < As.size() - 1; ++i) {
+void fill_diags(double h, double tau, Points& As, Points& Bs, Points& Cs, const Points& u) {
+  int i = 0;
+  As[i] = 0;
+  Bs[i] = B(h, tau, u[i]);
+  Cs[i] = A(h, tau) + C(h, tau);
+
+  for (i = 1; i < As.size() - 1; ++i) {
     As[i] = A(h, tau);
-    Bs[i] = B(h, tau);
+    Bs[i] = B(h, tau, u[i]);
     Cs[i] = C(h, tau);
   }
-  Bs[1] += As[1] * 4. / 3.;
-  Cs[1] -= As[1] / 3.;
-  As[1] = 0;
 
-  int n = As.size() - 1;
-  Bs[n] += Cs[n] * 4. / 3.;
-  As[n] -= Cs[n] / 3.;
+  As[i] = A(h, tau) + C(h, tau);
+  Bs[i] = B(h, tau, u[i]) - C(h, tau) * 8. * h * 50. * std::pow(u[i], 3.);
+  Cs[i] = 0;
 }
 
 void solve_tri(const Points& As, Points Bs, const Points& Cs, Points& f, Points& u) {
-  int n = f.size() - 1;
-  for (int i = 2; i < n; ++i) {
+  int n = f.size();
+  for (int i = 1; i < n; ++i) {
     double m = As[i] / Bs[i - 1];
     Bs[i] = Bs[i] - m * Cs[i - 1];
     f[i] = f[i] - m * f[i - 1];
@@ -74,7 +78,7 @@ void solve_tri(const Points& As, Points Bs, const Points& Cs, Points& f, Points&
 
   u[n - 1] = f[n - 1] / Bs[n - 1];
 
-  for (int i = n - 2; i > 0; i--) {
+  for (int i = n - 2; i >= 0; i--) {
     u[i] = (f[i] - Cs[i] * u[i + 1]) / Bs[i];
   }
 }
@@ -84,15 +88,9 @@ void solve_next(double h, double tau, Points& u) {
   static Points Bs(u.size());
   static Points Cs(u.size());
   static Points f(u.size());
-  fill_diags(h, tau, As, Bs, Cs);
+  fill_diags(h, tau, As, Bs, Cs, u);
   fill_f(u, h, tau, f);
-
-  int n = u.size() - 1;
-  double r = (4. * h * std::pow(u[n], 4.) - (3. * u[n] - 4. * u[n - 1] + u[n - 2])) / 3.;
-
   solve_tri(As, Bs, Cs, f, u);
-  u[0] = (4 * u[1] - u[2]) / 3.0;
-  u[n] = r + u[n - 1] * 4. / 3. - u[n - 2] / 3.;
 }
 
 void process(int N, int M) {
@@ -108,7 +106,7 @@ void process(int N, int M) {
     ou << ",\\(\\left.u\\right\\vert_{x=" << i << "}\\)";
   ou << "\n";
   for (int i = 0; i < N; ++i)
-    u[i] = beta * std::pow(1. - std::pow(i * h, 2.), 2);
+    u[i] = beta * std::pow(1. - std::pow(i * h, 2.), 2.);
 
   ofs << 0 << "," << f1(u, h) << "," << f2(u, h) << "\n";
   ou << 0;
