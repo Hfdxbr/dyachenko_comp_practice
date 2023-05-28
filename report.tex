@@ -28,31 +28,64 @@
 \newcommand{\Seminar}{\UpdateMe{НАЗВАНИЕ-ПРАКТИКУМА}}
 
 \begin{document}
-\begin{titlepage}
-    \centering
-    {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
-    \vfill
-    {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
-    \vfill
-    \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
-    \vfill
-    {\large Москва, \the\year{}\par}
-\end{titlepage}
+% \begin{titlepage}
+%     \centering
+%     {\scshape\Large \University\par}\vspace{1cm}{\scshape\large \Department\par}
+%     \vfill
+%     {\huge\bfseries ОТЧЕТ\par}{\Largeпо задаче практикума \enquote{\Seminar}\par}
+%     \vfill
+%     \hfill\begin{minipage}{0.45\linewidth}Выполнил студент гр. \GroupNum:\\\Student\end{minipage}
+%     \vfill
+%     {\large Москва, \the\year{}\par}
+% \end{titlepage}
 
 \section*{Задание}
-\UpdateMe{Описание задачи}
+Найти корни уравнения (Задача 1.21):
+\begin{equation} \label{eq}
+  f(x)=\sum_{0}^{3}\frac{(\pi-k)^2}{k!}x^{2k+1}=0.1\alpha
+\end{equation}
 
-\section*{Теория}
-\UpdateMe{Обозначения, основные конструкции, мат. постановка задачи}
+\section*{Анализ уравнения}
+Левая часть уравнения \cref{eq} является монотонной функций, т.к. её производная не отрицательна
+\begin{equation}
+  f'(x)=\sum_{0}^{3}\frac{(\pi-k)^2}{k!}(2k+1)x^{2k} \ge 0
+\end{equation}
+Следовательно уравнение имеет единственный корень.
+
+
+\section*{Метод простой итерации}
+Для поиска корня применим метод простой итерации, но используем два разных способа в зависимости от \(\alpha\).
+\subsection*{Случай \(\vert\alpha\vert\le100\)}
+В этом случае приведем уравнение \cref{eq} к виду
+\begin{gather}
+  x = \phi_1(x), \quad \phi_1(x) = \frac{1}{\pi^2}\left(0.1 \alpha - \sum_{1}^{3}\frac{(\pi-k)^2}{k!}x^{2k+1}\right),\\
+  \phi_1'(x) = \frac{1}{\pi^2}\left(- \sum_{1}^{3}\frac{(\pi-k)^2}{k!}(2k+1)x^{2k}\right).
+\end{gather}
+При указанных значениях \(\alpha\) в окрестности корня выполнено условие \(\phi_1'(x) \le 1\) и метод сходится.
+
+\subsection*{Случай \(\vert\alpha\vert > 100\)}
+Введем функцию ошибки \(g(x)\):
+\begin{equation}
+  g(x)=0.1\alpha - f(x)
+\end{equation}
+Итерационный процесс построим по следующей схеме:
+\begin{gather}
+  x = \phi_2(x), \quad \phi_2(x)=x + k(\alpha)g(x),\\
+  \phi_2'(x) = 1 - k(\alpha) f'(x).
+\end{gather}
+Условие сходимости достигается за счёт выбора функции \(k(\alpha)\). Например её можно взять кусочно-постоянной:
+\begin{equation}
+  k(\alpha) = 0.5\times 10^{\lfloor \log_{10}(\alpha)\rfloor}
+\end{equation}
 
 \section*{Результаты}
-\UpdateMe{Полученные результаты}
+\csvautotabular{data/stats.csv}
 
-\addcontentsline{toc}{section}{Список литературы}
-\begin{thebibliography}{99}
-  \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
-  \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
-  \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
-  \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
-\end{thebibliography}
+% \addcontentsline{toc}{section}{Список литературы}
+% \begin{thebibliography}{99}
+%   \bibitem{RKM}\textbf{О.Б. Арушанян, С.Ф. Залеткин} Решение систем обыкновенных дифференциальных уравнений методами Рунге--Кутта.
+%   \bibitem{TAC}\textbf{Д.П. Ким} Теория автоматического управления. Том 2.
+%   \bibitem{OM}\textbf{Н.Л. Майорова, Д.В. Глазков} Методы оптимизации.
+%   \bibitem{DEP}\textbf{А.Ф. Филиппов} Сборник задач по дифференциальным уравнениям.
+% \end{thebibliography}
 \end{document}

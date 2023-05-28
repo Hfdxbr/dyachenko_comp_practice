@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Set Up Git Repository
         uses: actions/checkout@v2
+      - name: Compile and execute
+        run: make run
       - name: Compile LaTeX Document
         uses: xu-cheng/latex-action@v2
         with:
