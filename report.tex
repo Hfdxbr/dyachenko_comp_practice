@@ -42,7 +42,7 @@
 \section*{Задание}
 Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.44}):
 \begin{gather*}
-  \alpha x_{tt}+x^2+\lambda t^2=1, \quad t\in(0, 1),\\
+  x_{tt}+x^2+\lambda t^2=1, \quad t\in(0, 1),\\
   \left.x\right\vert_{t=0}=0, \quad \left.x_{t}\right\vert_{t=0}=1,\\
   \left.x\right\vert_{t=1}=1.
 \end{gather*}
@@ -180,6 +180,10 @@
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {data/points.csv};
     \addlegendentry{$x_1$}
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
     \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {data/points.csv};
     \addlegendentry{$x_2$}
   \end{axis}
