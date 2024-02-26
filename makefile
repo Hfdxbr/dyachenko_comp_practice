@@ -1,39 +1,36 @@
-GCC = g++-11
-CPPFLAGS = -std=c++17 -O3
-LINKFLAGS = $(CPPFLAGS)
+EXEC := main.out
+OBJDIR := obj
+SRCDIR := src
+DEPDIR := $(OBJDIR)/.deps
+DATADIR := data
 
-report: clean_data latex clean_tex clean_cpp
+CXX := g++
+CXXFLAGS := -std=c++17 -I$(SRCDIR)
+LINKFLAGS := $(CXXFLAGS)
 
-prepare_data: build
-	./main 1.0 1.0 1e-7
-	./main 1.0 1.0 1e-9
-	./main 1.0 1.0 1e-11 print
-	./main 1.0 5.0 1e-7
-	./main 1.0 5.0 1e-9
-	./main 1.0 5.0 1e-11 print
-	./main 0.01 1.0 1e-7
-	./main 0.01 1.0 1e-9
-	./main 0.01 1.0 1e-11 print
-	echo "0.01,5.0,-,-,-,-" >>stats.csv
+SRCFILES := $(shell ls -A $(SRCDIR) | grep -E \.cpp$)
+DEPFILES := $(SRCFILES:%.cpp=$(DEPDIR)/%.d)
+OBJFILES := $(SRCFILES:%.cpp=$(OBJDIR)/%.o)
 
-build: main.o
-	${GCC} $? -o main $(LINKFLAGS)
+$(DEPDIR): ; @mkdir -p $@
+$(DATADIR): ; @mkdir -p $@
 
-%.o: %.cpp
-	${GCC} -c $< -o $@ $(CPPFLAGS)
+run: $(EXEC) | $(DATADIR)
+	cd $(DATADIR) && ../$(EXEC) 1.0 1e-7
+	cd $(DATADIR) && ../$(EXEC) 1.0 1e-9
+	cd $(DATADIR) && ../$(EXEC) 1.0 1e-11 print
 
-latex: prepare_data
-	pdflatex -interaction=nonstopmode report > /dev/null
-	pdflatex -interaction=nonstopmode report > /dev/null
 
-clean_tex:
-	rm -f *.aux *.log
+clean:
+	rm -rf $(OBJDIR) $(EXEC)
 
-clean_cpp:
-	rm -f *.o main
+$(EXEC): $(OBJFILES)
+	$(CXX) $(OBJDIR)/*.o -o $(EXEC) $(LINKFLAGS)
 
-clean_data:
-	rm -f *.csv
+$(DEPDIR)/%.d: $(SRCDIR)/%.cpp | $(DEPDIR)
+	$(CXX) -E $(CXXFLAGS) $< -MM -MT $(OBJDIR)/$(*:=.o) -MF $@
+	@echo '	$(CXX) $(CXXFLAGS) -c $$(filter %.cpp,$$<) -o $$@'>>$@
 
-clean: clean_tex clean_cpp clean_data
-	rm -f report.pdf
+$(OBJDIR)/%.o: $(DEPDIR)/%.d
+
+include $(DEPFILES)

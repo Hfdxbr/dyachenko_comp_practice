@@ -40,21 +40,20 @@
 % \end{titlepage}
 
 \section*{Задание}
-Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.25}):
+Найти решение задачи, удовлетворяющее указанным условиям ({\bfseries Задача~2.44}):
 \begin{gather*}
-  \alpha x_{tt}=\left(1+t^2\right)x, \quad t\in(0, \beta),\\
-  \left.x_{t}\right\vert_{t=0}=0,\\
-  \left.x_{t}\right\vert_{t=\beta}=1,\\
-  \alpha \in \{1.0, 0.01\}, \quad \beta \in \{1.0, 5.0\}.
+  \alpha x_{tt}+x^2+\lambda t^2=1, \quad t\in(0, 1),\\
+  \left.x\right\vert_{t=0}=0, \quad \left.x_{t}\right\vert_{t=0}=1,\\
+  \left.x\right\vert_{t=1}=1.
 \end{gather*}
 
 \section*{Постановка задачи}
 
 Введем обозначения \(x_1 = x, x_2=\dot{x}\). Тогда задача перепишется в виде:
 \begin{gather}
-  \label{common_system} \begin{cases}\dot{x}_2=\frac{x}{\alpha}\left(t^2+1\right)\\ \dot{x}_1=x_2 \end{cases},\\
-  \label{left_conditions} x_2(0)=0,\\
-  \label{right_conditions} x_2(\beta)=1.
+  \label{common_system} \begin{cases}\dot{x}_2=1-x_1^2-\lambda t^2\\ \dot{x}_1=x_2 \end{cases},\\
+  \label{left_conditions} x_1(0) = 0, \quad x_2(0)=1,\\
+  \label{right_conditions} x_1(1) = 0.
 \end{gather}
 
 \section*{Методика решения}
@@ -116,126 +115,75 @@
 
 Для краевой задачи \cref{common_system} из краевого условия \cref{left_conditions} имеем
 \begin{equation*}
-  x_2^0=0.
+  x_1^0=0, \quad x_2^0=1.
 \end{equation*}
 
-Другое ``начальное'' значения выберем в качестве параметра пристрелки
+Параметр \(\lambda\) выберем в качестве параметра пристрелки.
 
+Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=1\) получим некоторое решение \(\tilde{x}_1\) и \(\tilde{x}_2\).
+
+Варьируя параметр \(\lambda\) необходимо добиться выполнения краевого условия \cref{right_conditions}:
 \begin{equation*}
-  x_1^0=a.
+  \tilde{x}_1(1)=x_1^N=0.
 \end{equation*}
 
-Тогда решая систему \cref{common_system} с такими начальными условиями до момента времени \(t=\beta\) получим некоторое решение \(\tilde{x}_1\) и \(\tilde{x}_2\).
-
-Варьируя параметр \(a\) необходимо добиться выполнения краевого условия \cref{right_conditions}:
-\begin{equation*}
-  \tilde{x}_2(\beta)=x_2^N=1.
-\end{equation*}
-
-Будем искать параметр \(a\) методом простых итераций. Введём функцию \(\phi\) показывающую отклонение от заданного
+Будем искать параметр \(\lambda\) методом простых итераций. Введём функцию \(\phi\) показывающую отклонение от заданного
 граничного условия:
 \begin{equation*}
-  \phi(a)=x_2^N-1.
+  \phi(\lambda)=x_1^N-0.
 \end{equation*}
 
 Разложив эту функцию в окрестности точки \((a^{i})\) получим:
 
 \begin{equation*}
-  \phi(a)\simeq\phi(a^{i})+\delta a\frac{\partial \phi}{\partial a}(a^{i})\simeq0,
+  \phi(\lambda)\simeq\phi(\lambda^{i})+\delta \lambda\frac{\partial \phi}{\partial \lambda}(\lambda^{i})\simeq0,
 \end{equation*}
 
-где \(\delta a=a^{i+1}-a^{i}\). 
+где \(\delta \lambda=\lambda^{i+1}-\lambda^{i}\). 
 
 Тогда итерационный процесс может быть выражен формулой:
 \begin{equation*}
-  a^{i+1}=a^{i}-\phi(a^{i}) / \phi_a(a^{i}).
+  \lambda^{i+1}=\lambda^{i}-\phi(\lambda^{i}) / \phi_\lambda(\lambda^{i}).
 \end{equation*}
 
-В случае \(\phi_a(a^{i})=0\) значение \(a\) сбрасывается на случайное из интервала \([-10, 10]\).
-
-\subsection*{Оценка глобальной погрешности}
-Для оценки глобальной погрешности необходимо найти логарифмическую норму матрицы \(A=\frac{\partial \vec{f}}{\partial \vec{x}}\):
-\begin{gather*}
-  A=\begin{pmatrix}
-    0                    & 1  \\
-    \frac{t^2+1}{\alpha} & 0
-  \end{pmatrix}, \quad \frac{1}{2}\left(A^T+A\right)=\begin{pmatrix}
-    0                            & \frac{t^2+\alpha+1}{2\alpha} \\
-    \frac{t^2+\alpha+1}{2\alpha} & 0
-  \end{pmatrix}\Rightarrow\\
-  \Rightarrow \lambda=\pm\frac{t^2+\alpha+1}{2\alpha}.\\
-  \mu(A) = \lambda_{\max}=\frac{t^2+\alpha+1}{2\alpha}.
-\end{gather*}
+В случае \(\phi_\lambda(\lambda^{i})=0\) предполагается использовать иную стартовую точку.
 
 \section*{Результаты}
 
 \subsection*{Сводная таблица}
-\csvautotabular{stats.csv}
+\csvautotabular{data/stats.csv}
 
-Для каждого набора параметров \(\alpha\) и \(\beta\) должно быть выполнено:
+Для таблицы выше должно быть выполнено:
 \begin{equation*}
   \frac{n_{i}}{n_{j}}=\left(\frac{\varepsilon_{i}}{\varepsilon_{j}}\right)^{1/s}, \quad \frac{error_{i}}{error_{j}}=\left(\frac{\varepsilon_{j}}{\varepsilon_{i}}\right)^{(1-1/s)},
 \end{equation*}
 где \(s\) - порядок метода Рунге--Кутта.
 
-С учетом используемых значений имеем:
+Для метода Рунге--Кутта 5-го порядка ожидаем:
 \begin{equation*}
   \frac{n_{i+1}}{n_{i}}=\left(100\right)^{1/5}\simeq2.512, \quad \frac{error_{i}}{error_{i+1}}=\left(100\right)^{(1-1/5)}\simeq39.811.
 \end{equation*}
 
-\subsection*{Случай \(\alpha=1.0\) \(\beta=1.0\)}
-\begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b1.0.csv};
-    \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b1.0.csv};
-    \addlegendentry{$x_2$}
-  \end{axis}
-\end{tikzpicture}
+Из табличных данных следует
 \begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.286, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.438.
+  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.348, \quad
+  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.463.
 \end{equation*}
 \begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=39.248, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=38.420.
+  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=37.892, \quad
+  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=38.584,
 \end{equation*}
+что неплохо согласуется с теорией.
 
-\subsection*{Случай \(\alpha=1.0\) \(\beta=5.0\)}
+\subsection*{График решения}
 \begin{tikzpicture}
   \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a1.0_b5.0.csv};
+    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {data/points.csv};
     \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a1.0_b5.0.csv};
+    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {data/points.csv};
     \addlegendentry{$x_2$}
   \end{axis}
 \end{tikzpicture}
-\begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.543, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.504.
-\end{equation*}
-\begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=41.340, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=37.711.
-\end{equation*}
-
-\subsection*{Случай \(\alpha=0.01\) \(\beta=1.0\)}
-\begin{tikzpicture}
-  \begin{axis}[width=15cm, height=8cm, legend pos=outer north east, grid = major, grid style={dashed, gray!30}]
-    \addplot [thick, mark = none, red]table [x=t, y=x1, col sep=comma] {a0.01_b1.0.csv};
-    \addlegendentry{$x_1$}
-    \addplot [thick, mark = none, blue]table [x=t, y=x2, col sep=comma] {a0.01_b1.0.csv};
-    \addlegendentry{$x_2$}
-  \end{axis}
-\end{tikzpicture}
-\begin{equation*}
-  \frac{\left.n\right\vert_{\varepsilon=10^{-9}}}{\left.n\right\vert_{\varepsilon=10^{-7}}}=2.467, \quad
-  \frac{\left.n\right\vert_{\varepsilon=10^{-11}}}{\left.n\right\vert_{\varepsilon=10^{-9}}}=2.523.
-\end{equation*}
-\begin{equation*}
-  \frac{\left.error\right\vert_{\varepsilon=10^{-7}}}{\left.error\right\vert_{\varepsilon=10^{-9}}}=42.052, \quad
-  \frac{\left.error\right\vert_{\varepsilon=10^{-9}}}{\left.error\right\vert_{\varepsilon=10^{-11}}}=36.639.
-\end{equation*}
 
 % \addcontentsline{toc}{section}{Список литературы}
 % \begin{thebibliography}{99}
