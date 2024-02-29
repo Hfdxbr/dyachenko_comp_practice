@@ -25,56 +25,6 @@ using Vector2D = std::array<double, 2>;
 using Vector3D = std::array<double, 3>;
 using Solution = std::vector<Vector3D>;
 
-Vector2D& operator+=(Vector2D& a, const Vector2D& b) {
-  for (int i = 0; i < a.size(); ++i)
-    a[i] += b[i];
-  return a;
-}
-
-Vector2D operator+(const Vector2D& a, const Vector2D& b) {
-  auto r = a;
-  r += b;
-  return r;
-}
-
-Vector2D operator+(Vector2D&& a, const Vector2D& b) {
-  a += b;
-  return a;
-}
-
-Vector2D& operator-=(Vector2D& a, const Vector2D& b) {
-  for (int i = 0; i < a.size(); ++i)
-    a[i] -= b[i];
-  return a;
-}
-
-Vector2D operator-(const Vector2D& a, const Vector2D& b) {
-  auto r = a;
-  r -= b;
-  return r;
-}
-
-Vector2D operator-(Vector2D&& a, const Vector2D& b) {
-  a -= b;
-  return a;
-}
-
-Vector2D& operator*=(Vector2D& a, double k) {
-  for (int i = 0; i < a.size(); ++i)
-    a[i] *= k;
-  return a;
-}
-
-Vector2D operator*(const Vector2D& a, double k) {
-  auto r = a;
-  r *= k;
-  return r;
-}
-
-Vector2D operator*(Vector2D&& a, double k) {
-  a *= k;
-  return a;
-}
 
 double f1(const Vector2D& p, double t, double lambda) {
   const auto& [x1, x2] = p;
@@ -96,25 +46,29 @@ double norm(const Vector2D& v) {
   return std::sqrt(v1 * v1 + v2 * v2);
 }
 
-Vector2D calculate_k(Vector2D p, double t, double lambda, const Vector2D& k = {}) {
-  p += k;
-  return {f1(p, t, lambda), f2(p, t, lambda)};
+Vector2D tmp;
+template <class F>  // F = update_tmp_ith_pos(int i);
+void calculate_k_inplace(Vector2D& k, double t, double lambda, double h, F&& func) {
+  for (int i = 0; i < tmp.size(); ++i)
+    tmp[i] = func(i);
+  k = {f1(tmp, t, lambda) * h, f2(tmp, t, lambda) * h};
 }
 
-std::pair<Vector2D, Vector2D> gammas_with_error(const Vector3D& tp, double lambda, double h) {
-  auto [t, x1, x2] = tp;
-  Vector2D p = {x1, x2};
-  Vector2D k1 = calculate_k(p, t, lambda) * h;
-  Vector2D k2 = calculate_k(p, t + h * 0.5, lambda, k1 * 0.5) * h;
-  Vector2D k3 = calculate_k(p, t + h * 0.5, lambda, (k1 + k2) * 0.25) * h;
-  Vector2D k4 = calculate_k(p, t + h, lambda, k3 * 2. - k2) * h;
-  Vector2D k5 = calculate_k(p, t + h * (2. / 3.), lambda, (k1 * 7. + k2 * 10. + k4) * (1. / 27.)) * h;
-  Vector2D k6 =
-    calculate_k(p, t + h * 0.2, lambda, (k1 * 28. - k2 * 125. + k3 * 546. + k4 * 54. - k5 * 378.) * (1. / 625.)) * h;
+Vector2D k1, k2, k3, k4, k5, k6;
+Vector2D p, err;
+void gammas_with_error_inplace(const Vector3D& tp, double lambda, double h){
+  auto t = tp[0];
+  calculate_k_inplace(k1, t, lambda, h, [&tp](int i) { return tp[i+1]; });
+  calculate_k_inplace(k2, t + h * 0.5, lambda, h, [&tp](int i) { return tp[i+1] + k1[i] * 0.5; });
+  calculate_k_inplace(k3, t + h * 0.5, lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] + k2[i]) * 0.25; });
+  calculate_k_inplace(k4, t + h, lambda, h, [&tp](int i) { return tp[i+1] + k3[i] * 2 - k2[i]; });
+  calculate_k_inplace(k5, t + h * (2. / 3.), lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] * 7 + k2[i] * 10 + k4[i]) / 27; });
+  calculate_k_inplace(k6, t + h * 0.2, lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] * 28 - k2[i] * 125 + k3[i] * 546 + k4[i] * 54 - k5[i] * 378) / 625; });
 
-  Vector2D new_p = p + k1 * (1. / 24.) + k4 * (5. / 48.) + k5 * (27. / 56.) + k6 * (125. / 336.);
-  Vector2D err = (k1 * 42. + k3 * 224. + k4 * 21. - k5 * 162. - k6 * 125.) * (-1. / 336.);
-  return {new_p, err};
+  for (int i = 0; i < p.size(); ++i){
+    p[i] = tp[i+1] + k1[i] / 24 + k4[i] * (5. / 48) + k5[i] * (27. / 56) + k6[i] * (125. / 336);
+    err[i] = -(k1[i] * 42 + k3[i] * 224 + k4[i] * 21 - k5[i] * 162 - k6[i] * 125) / 336;
+  }
 }
 
 double update_step(const Vector2D& err, double h) {
@@ -127,7 +81,7 @@ Solution solve(double lambda, double& error) {
   double h = eps * 100.;
   Solution sol = {Vector3D{0, 0, 1}};
   while (t < T) {
-    auto [p, err] = gammas_with_error(sol.back(), lambda, h);
+    gammas_with_error_inplace(sol.back(), lambda, h);
     if (double error = norm(err); error > eps || error < 0.1 * eps) {
       h = update_step(err, h);
       continue;
@@ -140,7 +94,7 @@ Solution solve(double lambda, double& error) {
     }
 
     if (need_recalc)
-      std::tie(p, err) = gammas_with_error(sol.back(), lambda, h);
+      gammas_with_error_inplace(sol.back(), lambda, h);
 
     error += norm(err);
     t += h;

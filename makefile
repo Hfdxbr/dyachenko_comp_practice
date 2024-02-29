@@ -5,7 +5,7 @@ DEPDIR := $(OBJDIR)/.deps
 DATADIR := data
 
 CXX := g++
-CXXFLAGS := -std=c++17 -I$(SRCDIR)
+CXXFLAGS := -std=c++17 -O2 -I$(SRCDIR)
 LINKFLAGS := $(CXXFLAGS)
 
 SRCFILES := $(shell ls -A $(SRCDIR) | grep -E \.cpp$)
