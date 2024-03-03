@@ -21,152 +21,107 @@ std::string to_string(const T& value, int precision = 6, Modifier modifier = std
   return out.str();
 }
 
-using Vector2D = std::array<double, 2>;
-using Vector3D = std::array<double, 3>;
-using Solution = std::vector<Vector3D>;
+constexpr int N = 1000;
+constexpr double tau = 1.0 / (N - 1);
+constexpr double h = 1.0 / (N - 1);
 
+struct Params {
+  double alpha;
+  double beta;
+};
 
-double f1(const Vector2D& p, double t, double lambda) {
-  const auto& [x1, x2] = p;
-  return x2;
+using Layer = std::array<double, N>;
+using Solution = std::vector<Layer>;
+
+double dist(const Layer& a, const Layer b) {
+  double sum = 0;
+  for (int i = 0; i < N; ++i) sum += std::pow(a[i] - b[i], 2);
+  return std::sqrt(sum);
 }
 
-double f2(const Vector2D& p, double t, double lambda) {
-  const auto& [x1, x2] = p;
-  return 1. - lambda * std::pow(t, 2) - std::pow(x1, 2);
-}
+void tri_solve(const Layer& A, Layer& B, const Layer& C, Layer& F) {
+  for (int i = 1; i < N; ++i) {
+    double m = A[i - 1] / B[i - 1];
+    B[i] -= m * C[i - 1];
+    F[i] -= m * F[i - 1];
+  }
 
-double phi(const Solution& sol, double lambda) {
-  const auto& [t, x1, x2] = sol.back();
-  return x1 - 0.;
-}
-
-double norm(const Vector2D& v) {
-  const auto& [v1, v2] = v;
-  return std::sqrt(v1 * v1 + v2 * v2);
-}
-
-Vector2D tmp;
-template <class F>  // F = update_tmp_ith_pos(int i);
-void calculate_k_inplace(Vector2D& k, double t, double lambda, double h, F&& func) {
-  for (int i = 0; i < tmp.size(); ++i)
-    tmp[i] = func(i);
-  k = {f1(tmp, t, lambda) * h, f2(tmp, t, lambda) * h};
-}
-
-Vector2D k1, k2, k3, k4, k5, k6;
-Vector2D p, err;
-void gammas_with_error_inplace(const Vector3D& tp, double lambda, double h){
-  auto t = tp[0];
-  calculate_k_inplace(k1, t, lambda, h, [&tp](int i) { return tp[i+1]; });
-  calculate_k_inplace(k2, t + h * 0.5, lambda, h, [&tp](int i) { return tp[i+1] + k1[i] * 0.5; });
-  calculate_k_inplace(k3, t + h * 0.5, lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] + k2[i]) * 0.25; });
-  calculate_k_inplace(k4, t + h, lambda, h, [&tp](int i) { return tp[i+1] + k3[i] * 2 - k2[i]; });
-  calculate_k_inplace(k5, t + h * (2. / 3.), lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] * 7 + k2[i] * 10 + k4[i]) / 27; });
-  calculate_k_inplace(k6, t + h * 0.2, lambda, h, [&tp](int i) { return tp[i+1] + (k1[i] * 28 - k2[i] * 125 + k3[i] * 546 + k4[i] * 54 - k5[i] * 378) / 625; });
-
-  for (int i = 0; i < p.size(); ++i){
-    p[i] = tp[i+1] + k1[i] / 24 + k4[i] * (5. / 48) + k5[i] * (27. / 56) + k6[i] * (125. / 336);
-    err[i] = -(k1[i] * 42 + k3[i] * 224 + k4[i] * 21 - k5[i] * 162 - k6[i] * 125) / 336;
+  F[N - 1] /= B[N - 1];
+  for (int i = N - 2; i >= 0; --i) {
+    F[i] -= C[i] * F[i + 1];
+    F[i] /= B[i];
   }
 }
 
-double update_step(const Vector2D& err, double h) {
-  return std::clamp(std::pow(eps / (0.001 * eps + norm(err)), 1. / 6.), 0.1, 10.) * 0.95 * h;
+void fill(Layer& A, Layer& B, Layer& C, Layer& F, const Layer& u, double t, const Params& params) {}
+
+void set_boundary(Layer& A, Layer& B, Layer& C, Layer& F, double t, const Params& params) {
+  A.front() = C.front() = 0;
+  B.front() = 1;
+  F.front() = t > 0 ? t / (t + params.beta) : 0.0;
+  A.back() = C.back() = 0;
+  B.back() = 1;
+  F.back() = 0;
 }
 
-Solution solve(double lambda, double& error) {
-  double t = 0.0;
-  double T = 1.0;
-  double h = eps * 100.;
-  Solution sol = {Vector3D{0, 0, 1}};
-  while (t < T) {
-    gammas_with_error_inplace(sol.back(), lambda, h);
-    if (double error = norm(err); error > eps || error < 0.1 * eps) {
-      h = update_step(err, h);
-      continue;
-    }
-
-    bool need_recalc = false;
-    if (t + h >= T) {
-      h = T - t;
-      need_recalc = true;
-    }
-
-    if (need_recalc)
-      gammas_with_error_inplace(sol.back(), lambda, h);
-
-    error += norm(err);
-    t += h;
-    sol.push_back({t, p[0], p[1]});
+Solution solve(const Params& params, double& error) {
+  Solution sol = {Layer{}};
+  sol.back().fill(0);
+  Layer A, B, C, F;
+  for (int i = 1; i < N; ++i) {
+    double t = tau * i;
+    Layer x;
+    fill(A, B, C, F, sol.back(), t, params);
+    set_boundary(A, B, C, F, t, params);
+    tri_solve(A, B, C, F);
+    do {
+      x = std::move(F);
+      fill(A, B, C, F, x, t, params);
+      set_boundary(A, B, C, F, t, params);
+      tri_solve(A, B, C, F);
+    } while (dist(x, F) > eps);
+    sol.push_back(F);
   }
+
+  for (int i = 1; i < N - 1; ++i) {
+    error += 0;
+  }
+
   return sol;
 }
 
-Solution shooting(double& lambda, double& error) {
-  double delta = 0.001;
-
-  while (true) {
-    std::cout << "Solving for lambda=" << to_string(lambda, 10) << std::endl;
-    Solution sol = solve(lambda, error);
-    double phi_ = phi(sol, lambda);
-
-    if (std::abs(phi_) < eps) {
-      std::cout << "Found!" << std::endl;
-      return sol;
-    }
-
-    double dphi;
-    {
-      double error = 0;
-      Solution sol_ = solve(lambda + delta, error);
-      dphi = (phi(sol_, lambda) - phi_) / delta;
-    }
-
-    if (std::abs(dphi) < eps)
-      throw std::runtime_error("Division by zero occured, try another start point.");
-
-    lambda = lambda - phi_ / dphi;
-  }
-}
-
-void print_points(const Solution& sol, double lambda, const std::string& filename) {
+void print_points(const Solution& sol, const std::string& filename) {
   std::ofstream ofs(filename);
-  ofs << "t,x1,x2" << std::endl;
-  std::for_each(sol.begin(), sol.end(), [&ofs](const Vector3D& tp) {
-    const auto& [t, x1, x2] = tp;
-    ofs << t << ',' << x1 << ',' << x2 << std::endl;
+  std::for_each(sol.begin(), sol.end(), [&ofs](const Layer& u) {
+    ofs << u[0];
+    for (int i = 1; i < N; ++i) ofs << ',' << u[i];
+    ofs << std::endl;
   });
 };
 
-void execute(double lambda) {
+void execute(const Params& params) {
   bool stats_exists = std::ifstream("stats.csv").good();
   std::ofstream ofs_stats("stats.csv", std::ios_base::app);
-  if (!stats_exists)
-    ofs_stats << "\\(\\varepsilon\\),\\(\\lambda\\),n,\\(x_1(1)\\),\\(error\\)" << std::endl;
+  if (!stats_exists) ofs_stats << "\\(\\alpha\\),\\(\\beta\\),\\(N\\),\\(error\\)" << std::endl;
   double error = 0;
-  Solution sol = shooting(lambda, error);
-
-  if (print_data)
-    print_points(sol, lambda, "points.csv");
-  const auto [t, x1, x2] = sol.back();
-  ofs_stats << to_string(eps, 1, std::scientific) << ','  //
-            << to_string(lambda, 10) << ','               //
-            << sol.size() << ','                          //
-            << x1 << ','                                  //
-            << to_string(error, 3, std::scientific) << std::endl;
+  Solution sol = solve(params, error);
+  std::stringstream out_file;
+  out_file << "points_" << to_string(params.alpha, 2, std::fixed) << "_"  //
+           << to_string(params.beta, 2, std::fixed) << ".csv";
+  print_points(sol, out_file.str());
+  ofs_stats << to_string(params.alpha, 2, std::fixed) << ','  //
+            << to_string(params.beta, 2, std::fixed) << ','   //
+            << N << ',' << to_string(error, 3, std::scientific) << std::endl;
 }
 
 int main(int argc, char* argv[]) {
   if (argc < 3) {
-    std::cout << "lambda and eps parameters required" << std::endl;
+    std::cout << "alpha and beta parameters required" << std::endl;
     return 1;
   }
-  double lambda = std::stod(argv[1]);
-  eps = std::stod(argv[2]);
-  if (argc == 4 && argv[3] == std::string("print"))
-    print_data = true;
-  execute(lambda);
+  double alpha = std::stod(argv[1]);
+  double beta = std::stod(argv[2]);
+  execute({alpha, beta});
 
   return 0;
 }
